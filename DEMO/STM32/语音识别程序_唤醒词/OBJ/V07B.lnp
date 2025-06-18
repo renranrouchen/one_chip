@@ -1,0 +1,6 @@
+".\OBJ\main.obj",
+".\OBJ\usart.obj",
+".\OBJ\Reg.obj",
+".\OBJ\LD3320.obj" 
+TO ".\OBJ\V07B" 
+PRINT(".\V07B.m51") RAMSIZE(256) 

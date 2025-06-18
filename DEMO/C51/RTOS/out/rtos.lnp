@@ -1,0 +1,4 @@
+".\out\main.obj",
+".\out\MyDemo.obj" 
+TO ".\out\rtos" Rtx51Tiny 
+PRINT(".\list\rtos.m51") RAMSIZE(256) 

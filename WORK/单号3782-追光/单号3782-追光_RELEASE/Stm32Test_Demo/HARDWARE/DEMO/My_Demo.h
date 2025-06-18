@@ -1,0 +1,5514 @@
+#ifndef __MY_DEMO_H
+#define __MY_DEMO_H	 
+#include "sys.h"
+#include "delay.h"
+#include "My_config.h"
+#if CONFIG_LCD1602 == ENABLED
+// D0  D1 D2 D3 D4 D5 D6 D7 E   RW RS
+// A15 B3 B4 B5 B6 B7 B8 B9 A12    A11
+#define RS                  PAout(11)                            
+#define RW									PAout(10) 
+#define EN                  PAout(12)  
+
+#define D0                  PAout(15)  
+#define D1                  PBout(3)
+#define D2                  PBout(4)
+#define D3                  PBout(5)
+#define D4                  PBout(6) 
+#define D5                  PBout(7)
+#define D6                  PBout(8)
+#define D7                  PBout(9)
+ 
+ 
+#define LCD1602_CLK  RCC_APB2Periph_GPIOA  
+
+#define LCD1602_GPIO_PORT   GPIOA
+
+#define LCD1602_E    GPIO_Pin_12              //定义使能引脚
+//#define LCD1602_RW   GPIO_Pin_13             //定义读写引脚
+#define LCD1602_RS   GPIO_Pin_11             //定义数据、命名引脚
+
+void LCD1602_Init_Demo(void);
+void Lcd1602_Display_Two_bit(unsigned char hang,unsigned char add,unsigned int date);
+void Lcd1602_Display_Three_bit(unsigned char hang,unsigned char add,unsigned int date);
+void Lcd1602_Display_String(unsigned char hang,unsigned char add,unsigned char *p);
+void Lcd1602_Display_guanbiao(unsigned char hang,unsigned char add,unsigned char date);
+ void LCD_Clear_Demo(void) ;
+#if CONFIG_DS1302 == ENABLED
+void Ds13b02_DisPlay(unsigned char hang,unsigned char add,unsigned char yue,unsigned char ri,unsigned char shi,unsigned char fen,unsigned char miao);
+void Ds13b02_DisPlay_Min(unsigned char hang,unsigned char add,unsigned char shi,unsigned char fen,unsigned char miao);
+#endif
+
+#if CONFIG_DS18b02 == ENABLED
+void Lcd1602_Display_Ds18b02(unsigned char hang,unsigned char add,unsigned int date);
+#endif 
+ /*demo
+ 
+		LCD1602_Init_Demo(); 
+		Lcd1602_Display_String(0,0,(u8*)"               ");
+		Lcd1602_Display_String(1,0,(u8*)"               ");
+
+Lcd1602_Display_guanbiao(0,0,0); 
+ int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();
+	  delay_ms(500);
+
+    LCD1602_Init_Demo();
+	  Lcd1602_Display_String(0,0,(u8*)"hello world");
+    Lcd1602_Display_Three_bit(0,0,PH0_Value);
+    while(1)
+    {
+
+
+			delay_ms(100);
+    }
+}
+
+==============>>>
+			case 1:
+				Lcd1602_Display_String(0,0,(u8*)"xx_set         ");
+				Lcd1602_Display_String(1,0,(u8*)"               ");
+				Lcd1602_Display_Three_bit(1,5,PH0_Value_l);
+
+		  break;
+			case 2:
+				Lcd1602_Display_String(0,0,(u8*)"xx_set         ");
+				Lcd1602_Display_String(1,0,(u8*)"               ");
+				Lcd1602_Display_Three_bit(1,5,PH1_Value_l);
+		  break;		
+==============>>>
+			case 1:
+				if(PH0_Value_l<99)
+				PH0_Value_l++;
+				Lcd1602_Display_Three_bit(1,5,PH0_Value_l);
+
+		  break;
+			case 2:
+				if(PH1_Value_l<99)
+				PH1_Value_l++;
+				Lcd1602_Display_Three_bit(1,5,PH1_Value_l);
+		  break;	
+==============>>>
+			case 1:
+				if(PH0_Value_l>0)
+				PH0_Value_l--;
+				Lcd1602_Display_Three_bit(1,5,PH0_Value_l);
+
+		  break;
+			case 2:
+				if(PH1_Value_l>0)
+				PH1_Value_l--;
+				Lcd1602_Display_Three_bit(1,5,PH1_Value_l);
+		  break;	
+
+============>>>> 
+ 
+ */
+#endif	 
+
+
+
+
+
+
+#if CONFIG_KEY == ENABLED
+
+#define Demo_KEY1 PBin(12)
+#define Demo_KEY2 PBin(13)
+#define Demo_KEY3 PBin(14)
+#define Demo_KEY4 PBin(15)
+#define Demo_KEY5 PBin(6)
+#define Demo_KEY6 PBin(7)
+#define KEY_COUNT 3 //定义需要几个按键，最多6个
+typedef void (*pKey_Process)(unsigned char );
+unsigned char Key_value_Demo(pKey_Process key_Process);	
+void KEY_Init_Demo(void);
+
+/******Key Demo******
+
+所有引脚
+
+B11  B10  B1  B0  A7  A6  A5  A4  A3  A2  A1  A0 C15  C14 C13
+B12  B13  B14 B15 A8  A9  A10 A11 A12 A15 B3  B4 B5   B6  B7  B8  B9
+
+A0~A12 A15
+B0 B1 B3~B15
+C13~C15
+
+OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"                ");
+OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"                ");
+OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");
+OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"");
+OLED_ShowNum_Three_Demo(8*5,16,PH0_Value_l);
+
+Lcd1602_Display_guanbiao(0,0,0);
+if(Menu_Count==0)
+
+unsigned char Menu_Count =0;
+void Key_Process_Demo(unsigned char Key_value)
+{
+
+	if(Key_value == 1)	 //设置键
+	{
+		Menu_Count ++;
+
+		if(Menu_Count >= 2)
+		{
+			//处理返回界面
+			Menu_Count = 0;
+		}
+
+		switch(Menu_Count)
+		{
+			case 1:
+				break;
+			case 2:
+				break;
+		}
+	}
+
+	if(Key_value == 2)	 //
+	{
+		switch(Menu_Count)
+		{
+			case 1:
+				break;
+			case 2:
+				break;
+		}
+	}
+	
+	if(Key_value == 3)	 //
+	{
+		switch(Menu_Count)
+		{
+			case 1:
+				break;
+			case 2:
+				break;
+		}
+	}		
+		
+}
+
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();
+	  delay_ms(500);
+	  KEY_Init_Demo();
+    while(1)
+    {
+
+			Key_value_Demo(Key_Process_Demo);
+			if(Menu_Count==0)
+			{
+			
+			}
+			delay_ms(100);
+    }
+}
+
+==============>>>
+			case 1:
+				OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"               ");	
+				OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"               ");	
+				OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"               ");	
+				OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"               ");				
+				OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"_set:");
+				OLED_ShowNum_Three_Demo(8*5,16,PH0_Value_l);
+
+		  break;
+			case 2:
+				OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"               ");	
+				OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"               ");	
+				OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"               ");	
+				OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"               ");				
+				OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"_set:");
+				OLED_ShowNum_Three_Demo(8*5,16,PH1_Value_l);
+		  break;		
+==============>>>
+			case 1:
+				if(PH0_Value_l<99)
+				PH0_Value_l++;
+				OLED_ShowNum_Three_Demo(8*5,16,PH0_Value_l);
+
+		  break;
+			case 2:
+				if(PH1_Value_l<99)
+				PH1_Value_l++;
+				OLED_ShowNum_Three_Demo(8*5,16,PH1_Value_l);
+		  break;	
+==============>>>
+			case 1:
+				if(PH0_Value_l>0)
+				PH0_Value_l--;
+				OLED_ShowNum_Three_Demo(8*5,16,PH0_Value_l);
+
+		  break;
+			case 2:
+				if(PH1_Value_l>0)
+				PH1_Value_l--;
+				OLED_ShowNum_Three_Demo(8*5,16,PH1_Value_l);
+		  break;	
+
+============>>>>
+
+unsigned char KeyValue;
+void Key_Process_Demo(unsigned char Key_value)
+{
+				
+}
+int main(void)
+{
+		delay_init();	    		//延时函数初始化
+		NVIC_Configuration();	
+		//不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);
+		GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);	
+		delay_ms(500);
+
+		while(1)
+		{			
+			KeyValue=Key_value_Demo(Key_Process_Demo);
+			delay_ms(100);
+		}
+}
+
+
+=====================>>>>>>>>>>>>>>
+
+unsigned char ucDisplayFlag=1;
+unsigned char Menu_Count =0;
+#define SETNUM 4
+typedef void (*pFuc_Process)(unsigned char hang,unsigned char add,unsigned int date);
+typedef struct _postion
+{
+	unsigned char x;
+	unsigned char y;
+	
+}postion;
+typedef struct _displaySet
+{
+	char* name;
+	unsigned char value;
+	pFuc_Process pFuc;
+	postion pxy;
+}displaySet;
+displaySet tDisplaySet[SETNUM] =
+{
+	{
+		.name="xx1 SET",
+		.value=50,
+		.pFuc = OLED_ShowNum_Three_Demo,
+		.pxy.x=8*5,
+		.pxy.y=16,
+	},
+	{
+		.name="xx2 SET",
+		.value=50,
+		.pFuc = OLED_ShowNum_Three_Demo,
+		.pxy.x=8*5,
+		.pxy.y=16,
+	},
+	{
+		.name="xx3 SET",
+		.value=60,
+		.pFuc = OLED_ShowNum_Three_Demo,
+		.pxy.x=8*5,
+		.pxy.y=16,
+	},
+	{
+		.name="xx4 SET",
+		.value=60,
+		.pFuc = OLED_ShowNum_Three_Demo,
+		.pxy.x=8*5,
+		.pxy.y=16,
+	},
+};
+void Key_Process_Demo(unsigned char Key_value)
+{
+
+	if(Key_value == 1)	 //设置键
+	{
+		Menu_Count ++;
+
+		if(Menu_Count >= SETNUM+1)
+		{
+			ucDisplayFlag=1;
+			//处理返回界面
+			Menu_Count = 0;
+			return;
+		}
+		if(Menu_Count>0)
+		{
+
+			OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"               ");	
+			OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"               ");	
+			OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"               ");	
+			OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"               ");		
+			OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)tDisplaySet[Menu_Count-1].name);
+			tDisplaySet[Menu_Count-1].pFuc(tDisplaySet[Menu_Count-1].pxy.x,tDisplaySet[Menu_Count-1].pxy.y,tDisplaySet[Menu_Count-1].value);	
+				
+		}
+
+	}
+
+	if(Key_value == 2)	 //
+	{
+		if(Menu_Count>0)
+		{
+			tDisplaySet[Menu_Count-1].value++;
+			tDisplaySet[Menu_Count-1].pFuc(tDisplaySet[Menu_Count-1].pxy.x,tDisplaySet[Menu_Count-1].pxy.y,tDisplaySet[Menu_Count-1].value);			
+		}
+	}
+	
+	if(Key_value == 3)	 //
+	{
+		if(Menu_Count>0)
+		{
+			tDisplaySet[Menu_Count-1].value--;
+			tDisplaySet[Menu_Count-1].pFuc(tDisplaySet[Menu_Count-1].pxy.x,tDisplaySet[Menu_Count-1].pxy.y,tDisplaySet[Menu_Count-1].value);		
+		}
+	}		
+		
+}
+int main(void)
+{
+		delay_init();	    		//延时函数初始化
+		NVIC_Configuration();	
+		//不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);
+		GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);	
+		delay_ms(500);
+		 KEY_Init_Demo();
+		OLED_Init3_Demo();
+		while(1)
+		{			
+			Key_value_Demo(Key_Process_Demo);
+			if(Menu_Count==0)
+			{
+				if(ucDisplayFlag)
+				{
+					ucDisplayFlag=0;
+					OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"                ");
+					OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"                ");
+					OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+					OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");				
+					//显示
+				}
+
+		
+			}
+			delay_ms(100);
+		}
+}
+
+
+
+
+
+***/
+
+
+#endif
+
+#if CONFIG_ADC == ENABLED
+#include "stm32f10x_adc.h"
+#define Channel_Num_Demo  5			//
+#define Sample_Num_Demo  10			//
+
+void ADC1_Config_Demo(void);
+uint16_t ReadADCAverageValue_Demo(uint16_t Channel);
+
+/*DEMO
+
+volatile u16 PH0_Value_l = 20;
+volatile u16 PH1_Value_l = 30;
+volatile u16 PH2_Value_l = 40;
+
+volatile u16 PH0_Value = 0;
+volatile u16 PH1_Value = 0;
+volatile u16 PH2_Value = 0;
+
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();
+	  delay_ms(500);
+		ADC1_Config_Demo();
+    LCD1602_Init_Demo();
+
+
+    while(1)
+    {
+		
+
+			PH0_Value = (ReadADCAverageValue_Demo(0))*100/4096;			
+			PH1_Value = (ReadADCAverageValue_Demo(1))*100/4096;			
+			PH2_Value = (ReadADCAverageValue_Demo(2))*100/4096;	
+			OLED_ShowNum_Three_Demo(0,16,PH0_Value);	
+			OLED_ShowNum_Three_Demo(0,32,PH1_Value);
+			OLED_ShowNum_Three_Demo(0,48,PH2_Value);
+			
+		
+			PH0_Value = ReadADCAverageValue_Demo(0);
+			PH1_Value = ReadADCAverageValue_Demo(1);
+			PH2_Value = ReadADCAverageValue_Demo(2);
+			PH0_Value = (PH0_Value)*100/4096;
+			PH1_Value = (PH1_Value)*100/4096;
+			PH2_Value = (PH2_Value)*100/4096;
+
+			
+			OLED_ShowNum_Three_Demo(0,16,PH0_Value);
+			OLED_ShowNum_Three_Demo(0,32,PH1_Value);
+			OLED_ShowNum_Three_Demo(0,48,PH2_Value);
+			
+			Lcd1602_Display_Three_bit(0,0,PH0_Value);
+			Lcd1602_Display_Three_bit(0,5,PH1_Value);
+			Lcd1602_Display_Three_bit(0,10,PH2_Value);			
+			delay_ms(100);
+    }
+}
+
+*/
+
+#endif
+
+#if CONFIG_OLED_4PIN == ENABLED
+#define SCL3_0	GPIO_ResetBits(GPIOB,GPIO_Pin_9)			// Serial Clock Input
+#define SDA3_0	GPIO_ResetBits(GPIOB,GPIO_Pin_8)				// Serial Data Input
+
+
+#define SCL3_1	GPIO_SetBits(GPIOB,GPIO_Pin_9)					// Serial Clock Input
+#define SDA3_1	GPIO_SetBits(GPIOB,GPIO_Pin_8)					// Serial Data Input
+
+void	OLED_Init3_Demo(void);
+void OLED_ShowStr_ENCH_Demo(u8 x, u8 y,unsigned char *s);
+void OLED_ShowNum_Demo(u8 x, u8 y,unsigned int num);
+void OLED_ShowNum_One_Demo(unsigned char row,unsigned char col,unsigned int s);
+void OLED_ShowNum_Two_Demo(unsigned char row,unsigned char col,unsigned int s);
+void OLED_ShowNum_Three_Demo(unsigned char row,unsigned char col,unsigned int s);
+void OLED_ShowNum_four_Demo(unsigned char row,unsigned char col,unsigned int s);
+void OLED_ShowNum_Temp_Demo(unsigned char row,unsigned char col,unsigned int s);
+
+void OLED_Refresh_Gram_Demo(void);
+void OLED_ShowNum_Weight_Demo(unsigned char row,unsigned char col,unsigned int s);
+void OLED_Clear_Demo(void);
+void OLED_ShowNum_BMP180_Demo(unsigned char row,unsigned char col,unsigned int s);
+#if CONFIG_CARSPEED == ENABLED
+void OLED_ShowNum_fiive_Demo(unsigned char row,unsigned char col,unsigned int s);
+#endif
+
+#if CONFIG_DS1302 == ENABLED
+void OLED_ShowNum_Ds13b02_Min(unsigned char row,unsigned char col,unsigned char shi,unsigned char fen,unsigned char miao);
+void OLED_ShowNum_Ds13b02_DisPlay(unsigned char row,unsigned char col,unsigned char yue,unsigned char ri,unsigned char shi,unsigned char fen,unsigned char miao);
+#endif
+/**demo
+
+//可以写八个汉字
+
+		OLED_Init3_Demo();
+		OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"                ");
+		OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"                ");
+		OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+		OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");
+		
+		OLED_ShowStr_ENCH_Demo(16*7,0,(unsigned char *)"<");
+		
+		OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"xxx");
+		
+(mode)?OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"Auto"):OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"Mual");
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();
+	  delay_ms(500);
+		ADC1_Config_Demo();
+		OLED_Init3_Demo();
+		OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"                ");
+		OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"                ");
+		OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+		OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");		
+		
+		
+		OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"欢迎使用密码");
+	  
+	  
+
+    while(1)
+    {
+			PH0_Value = ReadADCAverageValue_Demo(0);
+			PH1_Value = ReadADCAverageValue_Demo(1);
+			PH2_Value = ReadADCAverageValue_Demo(2);
+			PH0_Value = (4096-PH0_Value)*100/4096;
+			PH1_Value = (4096-PH1_Value)*100/4096;
+			PH2_Value = (4096-PH2_Value)*100/4096;
+			OLED_ShowNum_Three_Demo(0,16,PH0_Value);
+			OLED_ShowNum_Three_Demo(0,32,PH1_Value);
+			OLED_ShowNum_Three_Demo(0,48,PH2_Value);
+			
+			delay_ms(100);
+    }
+}
+
+
+**/
+#endif
+
+#if CONFIG_TIMER2 == ENABLED
+typedef void (*pTime2Process_Demo)(); 
+void TIM2_Int_Init_demo(u16 Period,u16 Prescaler,pTime2Process_Demo TimeProcess);
+
+/*DEMO
+
+unsigned long milli;
+void Tim2_Handle_Process_m()
+{
+		milli++;
+}
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();
+	  delay_ms(500);
+
+		OLED_Init3_Demo();
+		OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"欢迎使用密码");
+	  
+	  //定时器3初始化
+		TIM2_Int_Init_demo(10000, 7200,Tim2_Handle_Process_m);	 //72Mhz分频7200 = 10000HZ 
+
+    while(1)
+    {
+
+			OLED_ShowNum_Three_Demo(0,16,milli);
+
+			
+			delay_ms(100);
+    }
+}
+
+==========>>>
+
+u8  p_mode=0;
+unsigned long milli;
+void Tim2_Handle_Process_m()
+{
+	if(++milli>10)
+	{
+		count++;
+		milli=0;
+	}
+		
+	switch(p_mode)
+	{
+		case 0:
+			RELAY=0;
+		break;
+		case 1:
+			
+		RELAY=(milli<5)?0:1;
+		break;	
+		case 2:
+			
+		RELAY=1;
+		break;		
+	}
+}
+
+TIM2_Int_Init_demo(100, 7200,Tim2_Handle_Process_m);	
+
+*/
+#endif
+#if CONFIG_TIMER3 == ENABLED
+typedef void (*pTimeProcess_Demo)(); 
+void TIM3_Int_Init_Demo(u16 Period,u16 Prescaler,pTimeProcess_Demo TimeProcess);
+
+/*DEMO
+
+unsigned long milli;
+void Tim3_Handle_Process_m()
+{
+		milli++;
+}
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();
+	  delay_ms(500);
+
+		OLED_Init3_Demo();
+		OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"欢迎使用密码");
+	  
+	  //定时器3初始化
+		TIM3_Int_Init_Demo(10000, 7200,Tim3_Handle_Process_m);	  
+
+    while(1)
+    {
+
+			OLED_ShowNum_Three_Demo(0,16,milli);
+
+			
+			delay_ms(100);
+    }
+}
+
+
+*/
+#endif
+
+#if CONFIG_TIMER3_PWN == ENABLED
+
+void TIM3_PWM_Init_Demo(u16 arr,u16 psc);
+
+/**DEMO
+//说明0:为不分频，每次增加为72Mhz，899为总的数量，通过TIM_SetCompare2来调整占空比
+//TIM3_PWM_Init_Demo(899, 0);
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);		
+	  delay_ms(500);
+		TIM3_PWM_Init_Demo(899, 0);//0~900,bu fen ping
+    while(1)
+    {
+			TIM_SetCompare2(TIM3, 100); //0最亮，899最暗
+			delay_ms(100);
+    }
+}
+
+//电机
+
+unsigned char Menu_Count =0;
+void Key_Process_Demo(unsigned char Key_value)
+{
+
+	if(Key_value == 1)	 //设置键
+	{
+		
+		TIM_SetCompare2(TIM3, 0); //0不转
+		Menu_Count ++;
+
+		if(Menu_Count >= 2)
+		{
+			//处理返回界面
+			Menu_Count = 0;
+		}
+
+		switch(Menu_Count)
+		{
+			case 1:
+				break;
+			case 2:
+				break;
+		}
+	}
+
+	if(Key_value == 2)	 //
+	{
+	  RELAY=1;
+	  RELAY1=0;			
+		TIM_SetCompare2(TIM3, 500); //中速
+		switch(Menu_Count)
+		{
+			case 1:
+				break;
+			case 2:
+				break;
+		}
+	}
+	
+	if(Key_value == 3)	 //
+	{
+	  RELAY=0;
+	  RELAY1=1;		
+		TIM_SetCompare2(TIM3, 1000); //高速
+		switch(Menu_Count)
+		{
+			case 1:
+				break;
+			case 2:
+				break;
+		}
+	}		
+		
+}
+
+
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);		
+	  delay_ms(500);
+	  KEY_Init_Demo();
+	  relay_init();
+	  RELAY=1;
+	  RELAY1=0;
+		TIM3_PWM_Init_Demo(1000, 7199);//72000000/7200=10000HZ  每次0.1ms, 1000次为100ms
+    while(1)
+    {
+			Key_value_Demo(Key_Process_Demo);
+			delay_ms(100);
+    }
+}
+
+**/
+
+
+
+#endif
+
+#if CONFIG_TIMER4 == ENABLED
+typedef void (*pTime4Process_Demo)(); 
+void TIM4_Int_Init_Demo(u16 arr,u16 psc,pTime4Process_Demo TimeProcess);
+/*demo
+
+unsigned long milli;
+void Tim4_Handle_Process_m()
+{
+		milli++;
+}
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();
+	  delay_ms(500);
+
+		OLED_Init3_Demo();
+		OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"欢迎使用密码");
+	  
+	  //定时器4初始化
+		TIM4_Int_Init_Demo(10000, 7200,Tim4_Handle_Process_m);	  
+
+    while(1)
+    {
+
+			OLED_ShowNum_Three_Demo(0,16,milli);
+
+			
+			delay_ms(100);
+    }
+}
+
+
+*/
+#endif
+#if CONFIG_DS18b02 == ENABLED
+
+#define SDA_RCC_DS18B20			RCC_APB2Periph_GPIOB
+#define SDA_GPIO_DS18B20		GPIOB
+#define SDA_GPIO_PIN_DS18B20	GPIO_Pin_5
+////IO操作函数											   
+#define	DS18B20_DQ_OUT PBout(5) //数据端口	PA10
+#define	DS18B20_DQ_IN  PBin(5)  //数据端口	PA10 
+
+
+//IO方向设置 PB0 切换的时候注意是CRL(0~7) 还是CRH(8~15)
+#define DS18B20_IO_IN()  SDA_Set_Input_DS18B20()
+#define DS18B20_IO_OUT() SDA_Set_Output_DS18B20()
+
+
+u8 DS18B20_Init_Demo(void);
+short DS18B20_Get_Temp_Demo(void);
+void SDA_Set_Output_DS18B20(void);
+void SDA_Set_Input_DS18B20(void);
+/**demo
+
+short temp;
+short temp_l=20;
+short temp_h=40;
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();
+	  delay_ms(500);	  
+		DS18B20_Init_Demo();
+
+    while(1)
+    {
+		  //3wei shu
+      temp = DS18B20_Get_Temp_Demo();						
+			OLED_ShowNum_Three_Demo(0,16,temp);
+
+			Lcd1602_Display_Ds18b02(0,0,temp);
+			delay_ms(1000);
+    }
+}
+
+**/
+#endif
+
+#if CONFIG_MOTO_STEP == ENABLED
+
+#define MOTO_PIN0 PAout(4)
+#define MOTO_PIN1 PAout(5)
+#define MOTO_PIN2 PAout(6)
+#define MOTO_PIN3 PAout(7)
+
+#define MOTO_SET_Demo 300
+enum MotoStau_Demo
+{
+	MotoStop_Demo,
+	MotoZheng_Demo,
+	MotoFan_Demo,
+};
+void Moto_Zheng_Demo(unsigned char dat);
+void Moto_Fan_Demo(unsigned char dat);
+void MotoStopFun_Demo(void);
+void MotoStep_Init_Demo(pTimeProcess_Demo  TimeProce);
+/*demo
+#define MOTO_STEP 500
+u32 MotoPoint;
+unsigned char Motostatus=MotoFan_Demo;
+
+void Tim3_Handle_Process_m()
+{
+	static u8 i;
+	
+
+	switch(Motostatus)
+	{
+		case MotoStop_Demo:
+			MotoStopFun_Demo();
+			break;
+		case MotoZheng_Demo:
+
+			if(MotoPoint<MOTO_STEP)
+			{
+				i++;
+				if(i>=8)
+				{
+					i=0;
+					MotoPoint++;
+				}
+				
+				Moto_Zheng_Demo(i);
+				
+			}else
+				MotoStopFun_Demo();
+					
+			
+			break;
+		case MotoFan_Demo:
+			if(MotoPoint>0)
+			{
+				i++;
+				if(i>=8)
+				{
+					i=0;
+					MotoPoint--;
+				}
+				Moto_Fan_Demo(i);
+				
+			}else
+				MotoStopFun_Demo();
+			break;		
+	}
+
+			
+}
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();
+	  delay_ms(500);
+
+		OLED_Init3();
+
+	  //MOTO init
+	  MotoStep_Init_Demo(Tim3_Handle_Process_m);
+	 
+		Motostatus=MotoZheng_Demo;
+		
+		Motostatus=MotoFan_Demo;
+		
+    while(1)
+    {
+
+			//来回
+			if(Motostatus==MotoZheng_Demo&&MotoPoint>=MOTO_STEP)
+			{
+				Motostatus=MotoFan_Demo;
+			}else if(Motostatus==MotoFan_Demo&&MotoPoint==0)
+			{
+				Motostatus=MotoZheng_Demo;
+			}
+			
+			//按键处理
+			Motostatus=(Motostatus==MotoZheng_Demo)?MotoFan_Demo:MotoZheng_Demo;
+			//来回
+			if(Motostatus==MotoStop_Demo)
+			{
+				Motostatus=MotoZheng_Demo;
+			}
+			
+			delay_ms(100);
+    }
+}
+
+
+*/
+#endif
+
+#if CONFIG_MOTO_STEP_MUL == ENABLED
+
+#define MOTO_PIN0 PAout(5)
+#define MOTO_PIN1 PAout(6)
+#define MOTO_PIN2 PAout(7)
+#define MOTO_PIN3 PAout(8)
+
+#define MOTO_PIN01 PBout(0)
+#define MOTO_PIN11 PBout(1)
+#define MOTO_PIN21 PBout(3)
+#define MOTO_PIN31 PBout(4)
+
+enum MotoStau_Demo
+{
+	MotoStop_Demo,
+	MotoZheng_Demo,
+	MotoFan_Demo,
+	MotoInit_Demo,	
+};
+void Moto_Zheng_Demo(unsigned char dat);
+void Moto_Fan_Demo(unsigned char dat);
+void MotoStopFun_Demo(void);
+
+void Moto_Zheng_Demo1(unsigned char dat);
+void Moto_Fan_Demo1(unsigned char dat);
+void MotoStopFun_Demo1(void);
+void MotoStep_Init_Demo(pTimeProcess_Demo  TimeProce);
+/*demo
+#define MOTO_STEP 500
+u32 MotoPoint=0;
+unsigned char Motostatus=MotoFan_Demo;
+
+u32 MotoPoint1=0;
+unsigned char Motostatus1=MotoFan_Demo;
+
+void Tim3_Handle_Process_m()
+{
+	static u8 i=0,j=0;
+	
+
+	switch(Motostatus)
+	{
+		case MotoStop_Demo:
+			MotoStopFun_Demo();
+			break;
+		case MotoZheng_Demo:
+
+			if(MotoPoint<MOTO_STEP)
+			{
+				i++;
+				if(i>=8)
+				{
+					i=0;
+					MotoPoint++;
+				}
+				
+				Moto_Zheng_Demo(i);
+				
+			}else
+				MotoStopFun_Demo();
+					
+			
+			break;
+		case MotoFan_Demo:
+			if(MotoPoint>0)
+			{
+				i++;
+				if(i>=8)
+				{
+					i=0;
+					MotoPoint--;
+				}
+				Moto_Fan_Demo(i);
+				
+			}else
+				MotoStopFun_Demo();
+			break;		
+	}
+
+	switch(Motostatus1)
+	{
+		case MotoStop_Demo:
+			MotoStopFun_Demo1();
+			break;
+		case MotoZheng_Demo:
+
+			if(MotoPoint1<MOTO_STEP)
+			{
+				j++;
+				if(j>=8)
+				{
+					j=0;
+					MotoPoint1++;
+				}
+				
+				Moto_Zheng_Demo1(j);
+				
+			}else
+				MotoStopFun_Demo1();
+					
+			
+			break;
+		case MotoFan_Demo:
+			if(MotoPoint1>0)
+			{
+				j++;
+				if(j>=8)
+				{
+					j=0;
+					MotoPoint1--;
+				}
+				Moto_Fan_Demo1(j);
+				
+			}else
+				MotoStopFun_Demo1();
+			break;		
+	}			
+}
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();
+	  delay_ms(500);
+
+		OLED_Init3();
+
+	  //MOTO init
+	  MotoStep_Init_Demo(Tim3_Handle_Process_m);
+	 
+		Motostatus=MotoZheng_Demo;
+		
+		Motostatus=MotoFan_Demo;
+		
+    while(1)
+    {
+
+			//来回
+			if(Motostatus==MotoZheng_Demo&&MotoPoint>=MOTO_STEP)
+			{
+				Motostatus=MotoFan_Demo;
+			}else if(Motostatus==MotoFan_Demo&&MotoPoint==0)
+			{
+				Motostatus=MotoZheng_Demo;
+			}
+			
+			//按键处理
+			Motostatus=(Motostatus==MotoZheng_Demo)?MotoFan_Demo:MotoZheng_Demo;
+			//来回
+			if(Motostatus==MotoStop_Demo)
+			{
+				Motostatus=MotoZheng_Demo;
+			}
+			
+			delay_ms(100);
+    }
+}
+
+
+*/
+#endif
+#if CONFIG_USART1 == ENABLED
+extern u8 a1;
+void usart1_init_Demo(u32 bound);
+void usart1_SendString_Demo(unsigned char *Index);
+void usart1_SendByte_Demo(unsigned char a);
+
+
+/*DEMO
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();
+	  delay_ms(500);
+
+		OLED_Init3_Demo();
+		OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"欢迎使用密码");
+	  
+		usart1_init_Demo(9600);
+		usart2_init_Demo(9600);
+	  usart3_init_Demo(9600);	
+    while(1)
+    {
+			OLED_ShowNum_Three_Demo(0,16,a1);
+      OLED_ShowNum_Three_Demo(0,32,a3);
+			usart1_SendString_Demo("usart1 hello\r\n");
+			usart2_SendString_Demo("usart2 hello\r\n");
+			usart3_SendString_Demo("usart3 hello\r\n");
+			delay_ms(1000);
+    }
+}
+
+a1=='A'
+
+unsigned char buff[30];
+void bluetooth_Send(void)
+{
+	static unsigned char Cnt1 = 1;
+  if(++Cnt1 >= 5)
+	{
+		
+		Cnt1 = 0;
+		buff[0]= 'H';
+		buff[1]= ':';
+		buff[2]= Temp/100%10+0x30;
+		buff[3]= Temp/10%10+0x30;
+		buff[4]= Temp%10+0x30;
+		buff[5]= ',';
+		buff[6]= RhValue/100%10+0x30;
+		buff[7]= RhValue/10%10+0x30;
+		buff[8]= RhValue%10+0x30;
+		buff[9]= ',';		
+		buff[10]= PH0_Value/100%10+0x30;
+		buff[11]= PH0_Value/10%10+0x30;
+		buff[12]= PH0_Value%10+0x30;
+		buff[13]= ',';			
+		buff[14]= 'E';	
+			
+		usart1_SendString_Demo(buff);		
+	}	
+}
+
+语音模块带唤醒词
+u8 funFlag=0;
+if(a1=='#')
+{
+	a1=0;
+	funFlag=1;
+}
+if(funFlag==1)
+{
+	if(a1=='A')
+	{
+		a1=0;
+		//运行
+		funFlag=0;
+	}
+	
+	
+}
+*/
+#endif
+
+#if CONFIG_USART2 == ENABLED
+extern u8 a2;
+void usart2_init_Demo(u32 bound);
+void USART2SendByte_Demo(unsigned char SendData);
+void usart2_SendStringByLen_Demo(unsigned char * data,u8 len);
+void usart2_SendString_Demo(unsigned char * data);
+/*DEMO
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();
+	  delay_ms(500);
+
+		OLED_Init3_Demo();
+		OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"欢迎使用密码");
+	  
+		usart1_init_Demo(9600);
+		usart2_init_Demo(9600);
+	  usart3_init_Demo(9600);	
+    while(1)
+    {
+			OLED_ShowNum_Three_Demo(0,16,a1);
+      OLED_ShowNum_Three_Demo(0,32,a3);
+			usart1_SendString_Demo("usart1 hello\r\n");
+			usart2_SendString_Demo("usart2 hello\r\n");
+			usart3_SendString_Demo("usart3 hello\r\n");
+			delay_ms(1000);
+    }
+}
+
+
+*/
+#endif
+
+#if CONFIG_USART3 == ENABLED
+extern u8 a3;
+void usart3_init_Demo(u32 bound);
+void USART3SendByte_Demo(unsigned char SendData);
+void usart3_SendStringByLen_Demo(unsigned char * data,u8 len);
+void usart3_SendString_Demo(unsigned char * data);
+/*DEMO
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();
+	  delay_ms(500);
+
+		OLED_Init3_Demo();
+		OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"欢迎使用密码");
+	  
+		usart1_init_Demo(9600);
+		usart2_init_Demo(9600);
+	  usart3_init_Demo(9600);
+    while(1)
+    {
+			usart1_SendString_Demo("usart1 hello\r\n");
+			usart2_SendString_Demo("usart2 hello\r\n");
+			usart3_SendString_Demo("usart3 hello\r\n");
+			delay_ms(1000);
+    }
+}
+
+
+*/
+#endif
+
+#if CONFIG_SR04 == ENABLED
+#define Trig   PAout(3)
+#define Echo   PAin(4)
+void SR04_Init_Demo(void);
+void SR04_Processing_Demo(unsigned short *Length_Value);
+
+/*demo
+
+unsigned short length;
+unsigned short length_l=20;
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();
+	  delay_ms(500);
+		SR04_Init_Demo();
+		OLED_Init3_Demo();
+
+	  
+    while(1)
+    {
+      SR04_Processing_Demo(&length);
+			OLED_ShowNum_Three_Demo(0,16,length);
+			delay_ms(1000);
+    }
+}
+
+
+*/
+#endif
+
+#if CONFIG_FLASH == ENABLED
+#include "stmflash.h"
+#define FLASH_SAVE_ADDR  0X0800fe00	//设置FLASH 保存地址(必须为偶数，且其值要大于本代码所占用FLASH的大小+0X08000000)
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//用户根据自己的需要设置
+#define STM32_FLASH_SIZE 64 	 		//所选STM32的FLASH容量大小(单位为K)
+#define STM32_FLASH_WREN 1              //使能FLASH写入(0，不是能;1，使能)
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//FLASH起始地址
+#define STM32_FLASH_BASE 0x08000000 	//STM32 FLASH的起始地址
+//FLASH解锁键值
+
+void STMFLASH_Write_Demo(u32 WriteAddr,u16 *pBuffer,u16 NumToWrite);
+void STMFLASH_Read_Demo(u32 ReadAddr,u16 *pBuffer,u16 NumToRead);
+
+typedef struct _dataSave
+{
+	u8 saveFlag;
+	u8 saveValue[50];
+}dataSave;
+
+
+
+/**DEMO
+
+#include "stmflash.h"
+#define FLASH_SAVE_ADDR  0X0800fe00	//设置FLASH 保存地址(必须为偶数，且其值要大于本代码所占用FLASH的大小+0X08000000)
+u16 test_flash[2];
+
+u8 sava_data[10];
+STMFLASH_Write_Demo(FLASH_SAVE_ADDR,(u16*)sava_data,sizeof(sava_data)/2);
+STMFLASH_Read_Demo(FLASH_SAVE_ADDR,(u16*)sava_data,sizeof(sava_data)/2);
+void read_flash()
+{
+	
+	STMFLASH_Read_Demo(FLASH_SAVE_ADDR,test_flash,2);
+	//if(test_flash[0]==0xffff) return;  //如果为空，直接返回。
+	//取数据
+
+	
+}
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();
+	  delay_ms(500);
+		read_flash();
+
+    while(1)
+    {
+			test_flash[0]=1;
+			test_flash[1]=2;
+			STMFLASH_Write_Demo(FLASH_SAVE_ADDR,test_flash,2);  //测试缓存数据
+			//delay_ms(200);
+    }
+}
+
+
+
+dataSave FlashData;
+u8 SetValue[10]={0};
+void SaveDataFunc()
+{
+	u8 i=0,j=0;
+	FlashData.saveFlag='A';
+	FlashData.saveValue[i++]=SetValue[j++];
+	FlashData.saveValue[i++]=SetValue[j++];
+	FlashData.saveValue[i++]=SetValue[j++];
+	FlashData.saveValue[i++]=SetValue[j++];
+	FlashData.saveValue[i++]=SetValue[j++];
+	FlashData.saveValue[i++]=SetValue[j++];	
+	FlashData.saveValue[i++]=SetValue[j++];
+	FlashData.saveValue[i++]=SetValue[j++];
+	FlashData.saveValue[i++]=SetValue[j++];
+	STMFLASH_Write_Demo(FLASH_SAVE_ADDR,(u16*)&FlashData,sizeof(FlashData)/2);	
+}
+
+void DataInit()
+{
+	u8 i=0,j=0;
+	STMFLASH_Read_Demo(FLASH_SAVE_ADDR,(u16*)&FlashData,sizeof(FlashData)/2);
+	if(FlashData.saveFlag!='A')
+	{
+		SaveDataFunc();
+	}else
+	{
+		FlashData.saveValue[i++]=SetValue[j++];
+		FlashData.saveValue[i++]=SetValue[j++];
+		FlashData.saveValue[i++]=SetValue[j++];
+		FlashData.saveValue[i++]=SetValue[j++];
+		FlashData.saveValue[i++]=SetValue[j++];
+		FlashData.saveValue[i++]=SetValue[j++];	
+		FlashData.saveValue[i++]=SetValue[j++];
+		FlashData.saveValue[i++]=SetValue[j++];
+		FlashData.saveValue[i++]=SetValue[j++];		
+	}
+}
+int main(void)
+{
+		delay_init();	    		//延时函数初始化
+		NVIC_Configuration();	
+		//不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);
+		GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);	
+		delay_ms(500);
+		DataInit();
+		while(1)
+		{			
+
+			delay_ms(100);
+		}
+}
+
+
+
+
+
+
+
+
+**/
+#endif
+
+
+#if CONFIG_DS1302 == ENABLED
+
+
+#define SDA_RCC_DS1302			RCC_APB2Periph_GPIOB
+#define SDA_GPIO_DS1302		GPIOB
+#define SDA_GPIO_PIN_DS1302	GPIO_Pin_1
+
+#define SCK_RCC_DS1302			RCC_APB2Periph_GPIOB
+#define SCK_GPIO_DS1302		GPIOB
+#define SCK_GPIO_PIN_DS1302	GPIO_Pin_0
+
+#define RST_RCC_DS1302			RCC_APB2Periph_GPIOB
+#define RST_GPIO_DS1302		GPIOB
+#define RST_GPIO_PIN_DS1302	GPIO_Pin_4
+
+//IO操作函数									   
+#define	DS1302_DATA_OUT PBout(1) //数据端口	PB1 
+#define	DS1302_DATA_IN  PBin(1)  //数据端口	PB1 
+#define	DS1302_SCK  PBout(0)
+#define	DS1302_RST  PBout(4)
+
+
+//IO方向设置
+#define DS1302_IO_IN()  SDA_Set_Input_DS1302()
+#define DS1302_IO_OUT() SDA_Set_Output_DS1302()
+
+
+
+
+//DS1302地址定义
+#define ds1302_sec_add			  0x80		//秒数据地址
+#define ds1302_min_add			  0x82		//分数据地址
+#define ds1302_hr_add			    0x84		//时数据地址
+#define ds1302_date_add			  0x86		//日数据地址
+#define ds1302_month_add		  0x88		//月数据地址
+#define ds1302_day_add			  0x8a		//星期数据地址
+#define ds1302_year_add			  0x8c		//年数据地址
+#define ds1302_control_add		0x8e		//控制数据地址
+#define ds1302_charger_add		0x90 					 
+#define ds1302_clkburst_add		0xbe
+
+void DS1302_Init_Demo(void);
+void Ds1302_Read_Time_Demo(unsigned char *arry);
+void Ds1302_Save_Demo(unsigned char  po, unsigned char  dat);
+void SDA_Set_Output_DS1302(void);
+void SDA_Set_Input_DS1302(void);
+
+/******DS1302 Demo******
+
+unsigned char Time_arry[7];
+unsigned char Time_arry_o[3]={0,30,10};
+unsigned char Time_arry_c[3]={0,30,10};
+
+//if(Time_arry[2] == Time_arry_o[2] && Time_arry[1] == Time_arry_o[1] && Time_arry[0] == Time_arry_o[0])
+if(Time_arry[4] == Time_arry_o[4] &&Time_arry[3] == Time_arry_o[3] &&Time_arry[2] == Time_arry_o[2] && Time_arry[1] == Time_arry_o[1] && Time_arry[0] == Time_arry_o[0])
+
+	case 1:
+		OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"               ");	
+		OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"               ");	
+		OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"               ");	
+		OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"               ");				
+		OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"Time_set:       ");
+		OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry[4],Time_arry[3],Time_arry[2],Time_arry[1],Time_arry[0]);
+		OLED_ShowStr_ENCH_Demo(8,32,(unsigned char *)"^");
+		break;
+	case 2:
+		OLED_ShowStr_ENCH_Demo(8,32,(unsigned char *)" ");
+		OLED_ShowStr_ENCH_Demo(8*4,32,(unsigned char *)"^");
+		break;
+	case 3:
+		OLED_ShowStr_ENCH_Demo(8*4,32,(unsigned char *)" ");
+		OLED_ShowStr_ENCH_Demo(8*7,32,(unsigned char *)"^");				
+		break;
+	case 4:
+		OLED_ShowStr_ENCH_Demo(8*7,32,(unsigned char *)" ");
+		OLED_ShowStr_ENCH_Demo(8*10,32,(unsigned char *)"^");				
+		break;
+	case 5:
+		OLED_ShowStr_ENCH_Demo(8*10,32,(unsigned char *)" ");
+		OLED_ShowStr_ENCH_Demo(8*13,32,(unsigned char *)"^");				
+		break;
+		
+	case 6:
+		OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"               ");	
+		OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"               ");	
+		OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"               ");	
+		OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"               ");				
+		OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"Time_on:       ");
+		OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry_o[4],Time_arry_o[3],Time_arry_o[2],Time_arry_o[1],Time_arry_o[0]);
+		OLED_ShowStr_ENCH_Demo(8,32,(unsigned char *)"^");
+		break;
+	case 7:
+		OLED_ShowStr_ENCH_Demo(8,32,(unsigned char *)" ");
+		OLED_ShowStr_ENCH_Demo(8*4,32,(unsigned char *)"^");
+		break;
+	case 8:
+		OLED_ShowStr_ENCH_Demo(8*4,32,(unsigned char *)" ");
+		OLED_ShowStr_ENCH_Demo(8*7,32,(unsigned char *)"^");				
+		break;
+	case 9:
+		OLED_ShowStr_ENCH_Demo(8*7,32,(unsigned char *)" ");
+		OLED_ShowStr_ENCH_Demo(8*10,32,(unsigned char *)"^");				
+		break;
+	case 10:
+		OLED_ShowStr_ENCH_Demo(8*10,32,(unsigned char *)" ");
+		OLED_ShowStr_ENCH_Demo(8*13,32,(unsigned char *)"^");				
+		break;
+
+=======================================================>>
+  case 1:
+		if(Time_arry[4]<12)
+			Time_arry[4]++;
+		Ds1302_Save_Demo(ds1302_month_add,Time_arry[4]);
+		OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry[4],Time_arry[3],Time_arry[2],Time_arry[1],Time_arry[0]);
+						
+		break;
+	case 2:
+		if(Time_arry[3]<31)
+			Time_arry[3]++;
+		Ds1302_Save_Demo(ds1302_date_add,Time_arry[3]);
+		OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry[4],Time_arry[3],Time_arry[2],Time_arry[1],Time_arry[0]);
+						
+		break;
+	case 3:
+		if(Time_arry[2]<24)
+			Time_arry[2]++;
+		Ds1302_Save_Demo(ds1302_hr_add,Time_arry[2]);
+		OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry[4],Time_arry[3],Time_arry[2],Time_arry[1],Time_arry[0]);
+						
+		break;
+	case 4:
+		if(Time_arry[1]<60)
+			Time_arry[1]++;
+		Ds1302_Save_Demo(ds1302_min_add,Time_arry[1]);
+		OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry[4],Time_arry[3],Time_arry[2],Time_arry[1],Time_arry[0]);
+						
+		break;
+	case 5:
+		if(Time_arry[0]<60)
+			Time_arry[0]++;
+		Ds1302_Save_Demo(ds1302_sec_add,Time_arry[0]);
+		OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry[4],Time_arry[3],Time_arry[2],Time_arry[1],Time_arry[0]);
+						
+		break;
+  case 6:
+		if(Time_arry_o[4]<12)
+			Time_arry_o[4]++;
+		OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry_o[4],Time_arry_o[3],Time_arry_o[2],Time_arry_o[1],Time_arry_o[0]);
+						
+		break;
+	case 7:
+		if(Time_arry_o[3]<31)
+			Time_arry_o[3]++;
+		OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry_o[4],Time_arry_o[3],Time_arry_o[2],Time_arry_o[1],Time_arry_o[0]);
+						
+		break;
+	case 8:
+		if(Time_arry_o[2]<24)
+			Time_arry_o[2]++;
+		OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry_o[4],Time_arry_o[3],Time_arry_o[2],Time_arry_o[1],Time_arry_o[0]);
+						
+		break;
+	case 9:
+		if(Time_arry_o[1]<60)
+			Time_arry_o[1]++;
+		OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry_o[4],Time_arry_o[3],Time_arry_o[2],Time_arry_o[1],Time_arry_o[0]);
+						
+		break;
+	case 10:
+		if(Time_arry_o[0]<60)
+			Time_arry_o[0]++;
+		OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry_o[4],Time_arry_o[3],Time_arry_o[2],Time_arry_o[1],Time_arry_o[0]);
+						
+		break;
+=======================================================>>
+
+		case 1:
+			if(Time_arry[4]>0)
+				Time_arry[4]--;
+			Ds1302_Save_Demo(ds1302_month_add,Time_arry[4]);
+			OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry[4],Time_arry[3],Time_arry[2],Time_arry[1],Time_arry[0]);
+						
+			break;
+		case 2:
+			if(Time_arry[3]>0)
+				Time_arry[3]--;
+			Ds1302_Save_Demo(ds1302_date_add,Time_arry[3]);
+			OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry[4],Time_arry[3],Time_arry[2],Time_arry[1],Time_arry[0]);
+							
+			break;
+		case 3:
+			if(Time_arry[2]>0)
+				Time_arry[2]--;
+			Ds1302_Save_Demo(ds1302_hr_add,Time_arry[2]);	
+			OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry[4],Time_arry[3],Time_arry[2],Time_arry[1],Time_arry[0]);
+						
+			break;
+		case 4:
+			if(Time_arry[1]>0)
+				Time_arry[1]--;
+			Ds1302_Save_Demo(ds1302_min_add,Time_arry[1]);
+			OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry[4],Time_arry[3],Time_arry[2],Time_arry[1],Time_arry[0]);
+						
+			break;
+		case 5:
+			if(Time_arry[0]>0)
+				Time_arry[0]--;
+			Ds1302_Save_Demo(ds1302_sec_add,Time_arry[0]);
+			OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry[4],Time_arry[3],Time_arry[2],Time_arry[1],Time_arry[0]);
+						
+			break;		
+		case 6:
+			if(Time_arry_o[4]>0)
+				Time_arry_o[4]--;
+			OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry_o[4],Time_arry_o[3],Time_arry_o[2],Time_arry_o[1],Time_arry_o[0]);
+							
+			break;
+		case 7:
+			if(Time_arry_o[3]>0)
+				Time_arry_o[3]--;
+			OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry_o[4],Time_arry_o[3],Time_arry_o[2],Time_arry_o[1],Time_arry_o[0]);
+							
+			break;
+		case 8:
+			if(Time_arry_o[2]>0)
+				Time_arry_o[2]--;
+			OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry_o[4],Time_arry_o[3],Time_arry_o[2],Time_arry_o[1],Time_arry_o[0]);
+							
+			break;
+		case 9:
+			if(Time_arry_o[1]>0)
+				Time_arry_o[1]--;
+			OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry_o[4],Time_arry_o[3],Time_arry_o[2],Time_arry_o[1],Time_arry_o[0]);
+							
+			break;
+		case 10:
+			if(Time_arry_o[0]>0)
+				Time_arry_o[0]--;
+			OLED_ShowNum_Ds13b02_DisPlay(0,16,Time_arry_o[4],Time_arry_o[3],Time_arry_o[2],Time_arry_o[1],Time_arry_o[0]);
+							
+			break;
+
+
+
+
+
+unsigned char Time_arry[7];
+unsigned char Time_arry_o[3]={0,30,10};
+unsigned char Time_arry_c[3]={0,30,10};
+void main()
+{
+	DS1302_Init_Demo();
+	while(1)
+	{
+		Ds1302_Read_Time_Demo(Time_arry);
+		OLED_ShowNum_Ds13b02_Min(0,16,Time_arry[2],Time_arry[1],Time_arry[0]);
+		DelayMs_utrl(100);
+		
+		//设置时月秒
+		//Ds1302_Save_Demo(ds1302_hr_add,Time_arry[2]);
+		//Ds1302_Save_Demo(ds1302_min_add,Time_arry[1]);
+		//Ds1302_Save_Demo(ds1302_sec_add,Time_arry[0]);	
+	}
+}
+
+
+			case 1:
+				OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"               ");	
+				OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"               ");	
+				OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"               ");	
+				OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"               ");				
+				OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"Time_set:       ");
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry[2],Time_arry[1],Time_arry[0]);
+			  OLED_ShowStr_ENCH_Demo(8,32,(unsigned char *)"^");
+				break;
+      case 2:
+				OLED_ShowStr_ENCH_Demo(8,32,(unsigned char *)" ");
+				OLED_ShowStr_ENCH_Demo(32,32,(unsigned char *)"^");
+			  break;
+		  case 3:
+				OLED_ShowStr_ENCH_Demo(32,32,(unsigned char *)" ");
+				OLED_ShowStr_ENCH_Demo(56,32,(unsigned char *)"^");				
+			  break;
+			case 4:
+				OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"               ");	
+				OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"               ");	
+				OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"               ");	
+				OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"               ");				
+				OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"time_on:       ");
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry_o[2],Time_arry_o[1],Time_arry_o[0]);
+			  OLED_ShowStr_ENCH_Demo(8,32,(unsigned char *)"^");
+				break;
+      case 5:
+				OLED_ShowStr_ENCH_Demo(8,32,(unsigned char *)" ");
+				OLED_ShowStr_ENCH_Demo(32,32,(unsigned char *)"^");
+			  break;
+		  case 6:
+				OLED_ShowStr_ENCH_Demo(32,32,(unsigned char *)" ");
+				OLED_ShowStr_ENCH_Demo(56,32,(unsigned char *)"^");				
+			  break;
+
+			case 7:
+				OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"               ");	
+				OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"               ");	
+				OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"               ");	
+				OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"               ");				
+				OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"time_off:      ");
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry_c[2],Time_arry_c[1],Time_arry_c[0]);
+			  OLED_ShowStr_ENCH_Demo(8,32,(unsigned char *)"^");
+				break;
+      case 8:
+				OLED_ShowStr_ENCH_Demo(8,32,(unsigned char *)" ");
+				OLED_ShowStr_ENCH_Demo(32,32,(unsigned char *)"^");
+			  break;
+		  case 9:
+				OLED_ShowStr_ENCH_Demo(32,32,(unsigned char *)" ");
+				OLED_ShowStr_ENCH_Demo(56,32,(unsigned char *)"^");				
+			  break;
+				
+=======================================================>>
+			case 1:
+				if(Time_arry[2]<24)
+					Time_arry[2]++;
+				Ds1302_Save_Demo(ds1302_hr_add,Time_arry[2]);
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry[2],Time_arry[1],Time_arry[0]);
+
+				break;
+      case 2:
+				if(Time_arry[1]<60)
+					Time_arry[1]++;
+				Ds1302_Save_Demo(ds1302_min_add,Time_arry[1]);			
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry[2],Time_arry[1],Time_arry[0]);
+			  break;
+		  case 3:
+				if(Time_arry[0]<60)
+					Time_arry[0]++;
+				Ds1302_Save_Demo(ds1302_sec_add,Time_arry[0]);			
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry[2],Time_arry[1],Time_arry[0]);		
+			  break;
+			case 4:
+				if(Time_arry_o[2]<24)
+					Time_arry_o[2]++;
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry_o[2],Time_arry_o[1],Time_arry_o[0]);
+
+				break;
+      case 5:
+				if(Time_arry_o[1]<60)
+					Time_arry_o[1]++;			
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry_o[2],Time_arry_o[1],Time_arry_o[0]);
+			  break;
+		  case 6:
+				if(Time_arry_o[0]<60)
+					Time_arry_o[0]++;			
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry_o[2],Time_arry_o[1],Time_arry_o[0]);				
+			  break;
+
+			case 7:
+				if(Time_arry_c[2]<24)
+					Time_arry_c[2]++;			
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry_c[2],Time_arry_c[1],Time_arry_c[0]);
+				break;
+      case 8:
+				if(Time_arry_c[1]<60)
+					Time_arry_c[1]++;				
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry_c[2],Time_arry_c[1],Time_arry_c[0]);
+			  break;
+		  case 9:
+				if(Time_arry_c[0]<60)
+					Time_arry_c[0]++;				
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry_c[2],Time_arry_c[1],Time_arry_c[0]);			
+			  break;
+
+=======================================================>>
+			case 1:
+				if(Time_arry[2]>0)
+					Time_arry[2]--;	
+				Ds1302_Save_Demo(ds1302_hr_add,Time_arry[2]);
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry[2],Time_arry[1],Time_arry[0]);
+
+				break;
+      case 2:
+				if(Time_arry[1]>0)
+					Time_arry[1]--;	
+				Ds1302_Save_Demo(ds1302_min_add,Time_arry[1]);			
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry[2],Time_arry[1],Time_arry[0]);
+			  break;
+		  case 3:
+				if(Time_arry[0]>0)
+					Time_arry[0]--;	
+				Ds1302_Save_Demo(ds1302_sec_add,Time_arry[0]);			
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry[2],Time_arry[1],Time_arry[0]);		
+			  break;
+			case 4:
+				if(Time_arry_o[2]>0)
+					Time_arry_o[2]--;	
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry_o[2],Time_arry_o[1],Time_arry_o[0]);
+
+				break;
+      case 5:
+				if(Time_arry_o[1]>0)
+					Time_arry_o[1]--;				
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry_o[2],Time_arry_o[1],Time_arry_o[0]);
+			  break;
+		  case 6:
+				if(Time_arry_o[0]>0)
+					Time_arry_o[0]--;				
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry_o[2],Time_arry_o[1],Time_arry_o[0]);				
+			  break;
+
+			case 7:
+				if(Time_arry_c[2]>0)
+					Time_arry_c[2]--;				
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry_c[2],Time_arry_c[1],Time_arry_c[0]);
+				break;
+      case 8:
+				if(Time_arry_c[1]>0)
+					Time_arry_c[1]--;					
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry_c[2],Time_arry_c[1],Time_arry_c[0]);
+			  break;
+		  case 9:
+				if(Time_arry_c[0]>0)
+					Time_arry_c[0]--;				
+				OLED_ShowNum_Ds13b02_Min(0,16,Time_arry_c[2],Time_arry_c[1],Time_arry_c[0]);			
+			  break;
+*/
+
+#endif
+
+#if CONFIG_DHT11 == ENABLED
+
+//IO方向设置
+#define DHT11_IO_IN()  {GPIOC->CRH&=0XFF0FFFFF;GPIOC->CRH|=8<<20;}
+#define DHT11_IO_OUT() {GPIOC->CRH&=0XFF0FFFFF;GPIOC->CRH|=3<<20;}
+////IO操作函数											   
+#define	DHT11_DQ_OUT PCout(13) //数据端口	PA0 
+#define	DHT11_DQ_IN  PCin(13)  //数据端口	PA0 
+
+
+u8 DHT11_Init_Demo(void);
+u8 DHT11_Read_Data_Demo(u8 *temp,u8 *humi);
+/*demo
+
+unsigned char Temp,RhValue;
+unsigned char Temp_l=20,RhValue_l=50;
+unsigned char Temp_h=40,RhValue_h=70;
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();
+	  delay_ms(500);
+
+    LCD1602_Init();
+	  Lcd1602_Display_Two_bit(0,0,1);
+	  DHT11_Init_Demo();
+    while(1)
+    {
+			if(DHT11_Read_Data_Demo(&Temp,&RhValue) == 0)
+			{
+				OLED_ShowNum_Three_Demo(0,16,Temp);
+			  OLED_ShowNum_Three_Demo(0,16,RhValue);
+			}
+
+			if(DHT11_Read_Data_Demo(&Temp,&RhValue) == 0)
+			{
+				Lcd1602_Display_Three_bit(0,0,Temp);//读出温湿度，只取整数部分
+				Lcd1602_Display_Three_bit(1,0,RhValue);
+			}
+			delay_ms(200);
+    }
+}
+
+*/
+#endif
+
+#if CONFIG_HX711 == ENABLED
+#define GapValue 405
+
+void GPIO_Weigh_Init_Demo(void);
+unsigned long Get_Maopi_Demo(void);
+unsigned long Get_Weight_Demo(void);
+/*demo
+OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"weight: 0.000kg ");
+unsigned long Weight;
+unsigned long Weight_l=1000;
+
+Weight_l+=500;
+if(Weight_l>0)
+Weight_l-=500;
+
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();
+	  delay_ms(500);
+    uart_init(9600);
+    LCD1602_Init();
+    GPIO_Weigh_Init_Demo();
+	  Get_Maopi_Demo();
+    while(1)
+    {
+			Weight = Get_Weight_Demo();
+			OLED_ShowNum_Weight_Demo(0,0,Weight);
+			delay_ms(1000);
+    }
+}
+
+
+*/
+#endif
+
+#if CONFIG_LED == ENABLED
+
+#define LED PBout(10)
+void LED_Init_Demo(void);
+#endif
+
+#if CONFIG_MP3 == ENABLED
+#define BUSY   PCin(14)
+void MP3_Init_Demo(void);
+void Uart_SendCMD_Demo(unsigned char CMD ,unsigned char feedback , unsigned int dat);
+/*demo
+//停止
+Uart_SendCMD_Demo(0x0E,0,0);
+//播放
+Uart_SendCMD_Demo(0x0D,0,0);
+//上一首
+Uart_SendCMD_Demo(0x02,0,0);
+//下一首
+Uart_SendCMD_Demo(0x01,0,0);
+//音量
+Uart_SendCMD_Demo(0x06,0,30);
+//曲目
+Uart_SendCMD_Demo(0x03,0,4);
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);		
+	  delay_ms(500);
+    MP3_Init_Demo();
+		//语音提示
+		Uart_SendCMD_Demo(0x06,0,30);
+		delay_ms(500);
+		Uart_SendCMD_Demo(0x06,0,30);
+		delay_ms(500);
+		Uart_SendCMD_Demo(0x03,0,1);
+		delay_ms(500);	  
+    while(1)
+    {
+
+			delay_ms(1000);
+    }
+}
+
+0001 1
+0002 2
+0003 3
+0004 4
+0005 5
+0006 6
+0007 7
+0008 8
+0009 9
+0010 0
+
+
+#define DELAY 300
+void mp3Diplay()
+{
+	u8 vtemp=0;
+	Uart_SendCMD_Demo(0x03,0,11);
+	delay_ms(DELAY);
+	vtemp =Temp/10;
+	(vtemp==0)?Uart_SendCMD_Demo(0x03,0,10):Uart_SendCMD_Demo(0x03,0,vtemp);
+	delay_ms(DELAY);
+	vtemp =Temp%10;
+	(vtemp==0)?Uart_SendCMD_Demo(0x03,0,10):Uart_SendCMD_Demo(0x03,0,vtemp);
+	delay_ms(DELAY);
+
+	Uart_SendCMD_Demo(0x03,0,12);
+	delay_ms(DELAY);
+	vtemp =RhValue/10;
+	(vtemp==0)?Uart_SendCMD_Demo(0x03,0,10):Uart_SendCMD_Demo(0x03,0,vtemp);
+	delay_ms(DELAY);
+	vtemp =RhValue%10;
+	(vtemp==0)?Uart_SendCMD_Demo(0x03,0,10):Uart_SendCMD_Demo(0x03,0,vtemp);
+	delay_ms(DELAY);	
+
+	Uart_SendCMD_Demo(0x03,0,13);
+	delay_ms(DELAY);
+	vtemp =PH0_Value/10;
+	(vtemp==0)?Uart_SendCMD_Demo(0x03,0,10):Uart_SendCMD_Demo(0x03,0,vtemp);
+	delay_ms(DELAY);
+	vtemp =PH0_Value%10;
+	(vtemp==0)?Uart_SendCMD_Demo(0x03,0,10):Uart_SendCMD_Demo(0x03,0,vtemp);
+	delay_ms(DELAY);		
+}
+*/
+#endif
+
+#if CONFIG_GPS == ENABLED
+extern char string_n[15];
+extern char string_e[15];
+void GPS_Init_Demo(void);
+
+/*demo**
+
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);		
+	  delay_ms(500);
+    GPS_Init_Demo();
+		LCD1602_Init_Demo();
+	  Lcd1602_Display_String(0,0,(u8*)"N:             ");
+		Lcd1602_Display_String(1,0,(u8*)"E:             ");		
+		OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"N:              ");
+		OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"E:              ");
+		OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+		OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");		
+    while(1)
+    {
+			Lcd1602_Display_String(0,2,(u8*)string_n);
+			Lcd1602_Display_String(1,2,(u8*)string_e);
+			OLED_ShowStr_ENCH_Demo(8*2,0,(u8*)string_n);
+			OLED_ShowStr_ENCH_Demo(8*2,16,(u8*)string_e);			
+			delay_ms(1000);
+    }
+}
+*/
+#endif
+
+#if CONFIG_HEART_RATE == ENABLED
+//用到外部中断0 PA0 定时器3
+
+extern unsigned int xinLv;    //心率值
+void heart_rate_init_demo(void);
+
+/*demo
+
+heart_rate_init_demo();
+
+OLED_ShowNum_Three_Demo(0,16,xinLv);
+
+*/
+#endif
+
+#if CONFIG_GSM == ENABLED
+
+void gsm_init_demo(void);
+void GSM_SENT_demo(void);
+void gsm_usart3_SendString_Demo(unsigned char * data);
+ void gsm_usart3_send_byte_Demo(unsigned char SendData);
+ void SendNum(unsigned char num);
+ void SendTwoNum(unsigned char num);
+ void SendNum_char(unsigned char num);
+ /*demo
+if(stauts==0)
+{
+	stauts=1;
+}
+
+Send_SMS_EN(&stauts,option);
+
+u8 stauts=0;
+u8 option=0;
+unsigned char  dianhuahaoma[12]="18273129689";
+
+void Send_SMS_EN(unsigned char *sta,unsigned char option)
+{
+	
+		unsigned char _Data[1];
+		static unsigned char Step = 0;
+
+			
+			if(*sta!=0)
+			{
+				switch(Step)
+				{
+					case 0:
+								gsm_usart3_SendString_Demo((u8*)" AT\r\n"); Step++;
+								break;
+					
+					case 1: gsm_usart3_SendString_Demo((u8*)"ATE0\r\n");  Step++;  break;
+
+					
+					case 2:gsm_usart3_SendString_Demo((u8*)"AT+CMGF=1\r\n");Step++;break;
+			 
+					case 3:gsm_usart3_SendString_Demo((u8*)"AT+CSCS=\"GSM\"\r\n");Step++;break;
+			 
+					case 4:gsm_usart3_SendString_Demo((u8*)"AT+CSMP=17,167,1,0\r\n");Step++;break;
+					
+					case 5: gsm_usart3_SendString_Demo((u8*)"AT+CMGS=\"");Step++; 
+									gsm_usart3_SendString_Demo(dianhuahaoma);  								
+									gsm_usart3_SendString_Demo((u8*)"\"\r\n");
+					break;
+
+					case 6: 
+									switch(option)
+									{
+										case 0:
+											gsm_usart3_SendString_Demo((u8*)"HELLO"); 
+										break;
+									}
+									
+									_Data[0] = 0x1A;
+									gsm_usart3_send_byte_Demo(*_Data);
+									Step = 0;
+									*sta=0;
+									break;
+					default: Step = 0;
+					break;
+				}
+				delay_ms(100);
+		 }
+
+
+}
+
+void Send_SMS_CH(unsigned char *sta,unsigned char option)
+{
+	
+		unsigned char _Data[1];
+		static unsigned char Step = 0;
+		u8 send_number;
+			
+			if(*sta!=0)
+			{
+				switch(Step)
+				{
+					case 0:
+								gsm_usart3_SendString_Demo((u8*)" AT\r\n"); Step++;
+								break;
+					
+					case 1: gsm_usart3_SendString_Demo((u8*)"ATE0\r\n");  Step++;  break;
+
+					
+					case 2:gsm_usart3_SendString_Demo((u8*)"AT+CMGF=1\r\n");Step++;break;
+			 
+					case 3:gsm_usart3_SendString_Demo((u8*)"AT+CSCS=\"UCS2\"\r\n");Step++;break;
+			 
+
+					case 4: gsm_usart3_SendString_Demo((u8*)"AT+CSMP=17,0,1,8\r\n");Step++;  break;
+			 
+					case 5: gsm_usart3_SendString_Demo((u8*)"AT+CMGS=\"");Step++; 
+									for(send_number=0;send_number<11;send_number++)//在每位号码前加003
+									{
+										SendNum_char(dianhuahaoma[send_number]);
+									} 								
+									gsm_usart3_SendString_Demo((u8*)"\"\r\n");
+
+					break;
+
+					case 6: 
+									switch(option)
+									{
+										case 0:
+											gsm_usart3_SendString_Demo((u8*)"52305403836F65F695F48BF753CA65F65403836F"); 
+										break;
+									}
+									
+									gsm_usart3_SendString_Demo((u8*)"0020");			//发送空格
+									_Data[0] = 0x1A;
+									gsm_usart3_send_byte_Demo(*_Data);
+									Step = 0;
+									*sta=0;
+									break;
+					default: Step = 0;
+					break;
+				}
+				delay_ms(100);
+		 }
+
+
+}
+
+
+unsigned char Menu_Count =0;
+void Key_Process_Demo(unsigned char Key_value)
+{
+
+	if(Key_value == 1)	 //设置键
+	{
+		Menu_Count ++;
+		if(dianhuahaoma[0]<'9')
+		dianhuahaoma[0]++;
+    //Lcd1602_Display_String(0,0,dianhuahaoma);
+		if(Menu_Count >= 2)
+		{
+			//处理返回界面
+			Menu_Count = 0;
+		}
+
+		switch(Menu_Count)
+		{
+			case 1:
+				break;
+			case 2:
+				break;
+		}
+	}
+
+	if(Key_value == 2)	 //
+	{
+				if(dianhuahaoma[0]>'0')
+		dianhuahaoma[0]--;
+    //Lcd1602_Display_String(0,0,dianhuahaoma);
+		switch(Menu_Count)
+		{
+			case 1:
+				break;
+			case 2:
+				break;
+		}
+	}
+	
+	if(Key_value == 3)	 //
+	{stauts=1;
+		//SendString("AT\r\n");
+		switch(Menu_Count)
+		{
+			case 0:
+				
+				break;
+			case 1:
+				break;
+			case 2:
+				break;
+		}
+	}		
+		
+}
+ 
+ 
+ 
+unsigned char  PhoneNO[]= "18120747907"; //接收方号码
+
+
+unsigned char  dianhuahaoma[12]={1,8,1,2,0,7,4,7,9,0,7};
+void TransmitText(unsigned char Status)
+{
+	unsigned char send_number;
+	//需要空一格
+	gsm_usart3_SendString_Demo(" AT+CMGF=1\r\n"); //设置文本模式
+  delay_ms(1000);	
+	gsm_usart3_SendString_Demo("AT+CSCS=\"UCS2\"\r\n");//设置短信格式，发送汉字模式
+	delay_ms(1000);
+	gsm_usart3_SendString_Demo("AT+CSMP=AT+CSMP=17,0,1,8\r\n");//设置短信文本模式参数（具体内容参考开发资料内的模块资料）
+	delay_ms(1000);
+	
+	gsm_usart3_SendString_Demo("AT+CMGS=");	//信息发送指令 AT+CMGS=//
+	gsm_usart3_send_byte_Demo('"');
+	for(send_number=0;send_number<11;send_number++)//在每位号码前加003
+	{
+		SendNum(dianhuahaoma[send_number]);
+	}   
+	gsm_usart3_send_byte_Demo('"');
+	gsm_usart3_send_byte_Demo('\r');			//发送回车指令//
+	gsm_usart3_send_byte_Demo('\n');			//发送换行指令//
+	//该延时会影响下一个发送的第一个字节的数据
+//	delay_ms(1000);			
+	
+  //确保数据完整，不然会发送失败
+	gsm_usart3_SendString_Demo("8BF753CA65F6590474060021");//,请及时处理！
+	gsm_usart3_SendString_Demo("0020");			//发送空格
+	delay_ms(1000);	
+	gsm_usart3_send_byte_Demo(0x1a);  //确定发送短信
+	
+	gsm_usart3_send_byte_Demo('\r');
+	gsm_usart3_send_byte_Demo('\n');					
+	delay_ms(1000);
+}
+
+void GSM_SENT_demo(void)
+{
+		gsm_usart3_SendString_Demo((u8*)" AT+CMGF=1\r\n");	
+		
+		delay_ms(1000);
+		
+		gsm_usart3_SendString_Demo((u8*)"AT+CSCS=\"GSM\"\r\n");	
+		
+		delay_ms(1000);
+		
+		gsm_usart3_SendString_Demo((u8*)"AT+CMGS=");	//信息发送指令 AT+CMGS=//
+		gsm_usart3_send_byte_Demo('"');
+		gsm_usart3_SendString_Demo(PhoneNO);   
+		gsm_usart3_send_byte_Demo('"');
+		gsm_usart3_send_byte_Demo('\r');			//发送回车指令//
+		gsm_usart3_send_byte_Demo('\n');			//发送回车指令//
+		
+		delay_ms(1000);
+		
+	  gsm_usart3_SendString_Demo((u8*)" hello ");  
+
+		delay_ms(1000);
+		
+		gsm_usart3_send_byte_Demo(0x1a);
+		gsm_usart3_send_byte_Demo('\r');
+		gsm_usart3_send_byte_Demo('\n');					
+		delay_ms(1000);		
+}
+
+unsigned char Menu_Count =0;
+void Key_Process_Demo(unsigned char Key_value)
+{
+
+	if(Key_value == 1)	 //设置键
+	{
+    GSM_SENT_demo();
+		Lcd1602_Display_String(1,0,"h");
+	}
+
+	if(Key_value == 2)	 //
+	{
+    TransmitText(1);
+		Lcd1602_Display_String(1,0,"2");
+	}
+	
+	if(Key_value == 3)	 //
+	{
+		switch(Menu_Count)
+		{
+			case 1:
+				break;
+			case 2:
+				break;
+		}
+	}		
+		
+}
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);		
+	  delay_ms(500);
+	  KEY_Init_Demo();
+    gsm_init_demo();
+    LCD1602_Init_Demo();
+	  Lcd1602_Display_String(0,0,(u8*)"hello world");	
+    while(1)
+    {
+      Key_value_Demo(Key_Process_Demo);
+			delay_ms(100);
+    }
+}
+
+
+ */
+#endif
+
+
+#if CONFIG_BMP180 == ENABLED
+
+#define SDA_IN()  {GPIOB->CRL&=0X0FFFFFFF;GPIOB->CRL|=(u32)8<<28;}
+#define SDA_OUT() {GPIOB->CRL&=0X0FFFFFFF;GPIOB->CRL|=(u32)3<<28;}
+
+//IO操作函数	 
+#define IIC_SCL    PBout(6) //SCL
+#define IIC_SDA    PBout(7) //SDA	 
+#define READ_SDA   PBin(7)  //输入SDA 
+
+typedef struct __BMP180
+{
+	short AC1;
+	short AC2;
+	short AC3;
+	unsigned short AC4;
+	unsigned short AC5;
+	unsigned short AC6;
+	short B1;
+	short B2;
+	short MB;
+	short MC;
+	short MD;
+	long UT;
+	long UP;
+	long X1;
+	long X2;
+	long X3;
+	long B3;
+	unsigned long B4;
+	long B5;
+	long B6;
+	long B7;
+	long p;
+	long Temp;
+	float altitude;
+}_bmp180;
+
+
+extern _bmp180 bmp180;
+void BMP_Init(void);
+uint8_t BMP_ReadOneByte(uint8_t ReadAddr);
+void BMP_WriteOneByte(uint8_t WriteAddr,uint8_t DataToWrite);
+short BMP_ReadTwoByte(uint8_t ReadAddr);
+void BMP_ReadCalibrationData(void);
+long BMP_Read_UT(void);
+long BMP_Read_UP(void);
+void BMP_UncompemstatedToTrue(void);
+/*demo
+单位是  1000 000
+//		buff[15]= bmp180.p/1000000%10+0x30;
+//		buff[16]= bmp180.p/100000%10+0x30;
+//		buff[17]= bmp180.p/10000%10+0x30;
+//		buff[18]= bmp180.p/1000%10+0x30;	
+			buff[19]= '.';	
+			buff[20]= bmp180.p/100%10+0x30;	
+			buff[21]= bmp180.p/10%10+0x30;	
+
+
+OLED_ShowNum_BMP180_Demo(0,0,bmp180.p);
+int main(void)
+{
+	
+	  u8 ID = 0;
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);	
+	  delay_ms(500);
+		BMP_Init();
+		BMP_ReadCalibrationData();	
+    while(1)
+    {
+			ID = BMP_ReadOneByte(0xd0);
+			BMP_UncompemstatedToTrue();
+			OLED_ShowNum_BMP180_Demo(24,32,bmp180.p);				
+			delay_ms(100);
+    }
+}
+
+
+
+*/
+#endif
+
+#if CONFIG_ESP8266 == ENABLED
+extern u8 a1;
+void Esp8266_init(void);
+void esp8266_UART1_Send_String_Demo(unsigned char *Index);
+void ESP8266_Set(unsigned char *puf);
+/**demo
+
+unsigned char buff[30];
+void EPS8266_Send(void)
+{
+	static unsigned char Cnt1 = 1;
+  if(++Cnt1 == 5)
+	{
+		//IP为192.168.4.1 ，端口号为 5000
+		//ESP8266_Set 已经有加/r/n了AT+CIPSEND=0,26后要加回车，26为发送的长度，数量一定要准
+		ESP8266_Set((u8*)"AT+CIPSEND=0,26");	   ////发送字符长度  
+	}else if(Cnt1 >= 10)
+	{
+
+		Cnt1 = 0;
+		buff[0]= 'H';
+		buff[1]= ':';
+		buff[2]= 123/100%10+0x30;
+		buff[3]= 123/10%10+0x30;
+		buff[4]= 123%10+0x30;
+		buff[5]= ',';
+		buff[6]= 456/100%10+0x30;
+		buff[7]= 456/10%10+0x30;
+		buff[8]= ',';
+		buff[9]= 456%10+0x30;
+		buff[10]= ',';
+		buff[11]= 789/100%10+0x30;
+		buff[12]= 789/10%10+0x30;
+		buff[13]= 789%10+0x30;
+		buff[14]= ',';
+   	buff[15]= 1+0x30;
+		buff[16]= ',';
+   	buff[17]= 1+0x30;
+		buff[18]= ',';	
+   	buff[19]= 1+0x30;
+		buff[20]= ',';	
+   	buff[21]= 1+0x30;
+		buff[22]= ',';	
+   	buff[23]= 1+0x30;
+		buff[24]= ',';			
+		buff[25]= 'E';	
+			
+		esp8266_UART1_Send_String_Demo(buff);		
+	}	
+}
+unsigned char buff[30];
+void Esp8266_SendEx(void)
+{
+	u8 atBuff[20]={0};
+	u8 index=0;
+	static unsigned char Cnt1 = 0;
+
+  if(++Cnt1 == 5)
+	{
+		memset(buff,0,sizeof(buff));
+		buff[index++]= 'H';
+		buff[index++]= ':';
+		buff[index++]= 123/100%10+0x30;
+		buff[index++]= 123/10%10+0x30;
+		buff[index++]= 123%10+0x30;
+		buff[index++]= ',';
+		buff[index++]= 456/100%10+0x30;
+		buff[index++]= 456/10%10+0x30;
+		buff[index++]= 456%10+0x30;
+		buff[index++]= ',';
+		buff[index++]= 789/100%10+0x30;
+		buff[index++]= 789/10%10+0x30;
+		buff[index++]= 789%10+0x30;
+		buff[index++]= ',';
+		buff[index++]= 1+0x30;
+		buff[index++]= ',';	
+		buff[index++]= 'E';			
+		memset(atBuff,0,sizeof(atBuff));
+		sprintf((char*)atBuff,"AT+CIPSEND=0,%d",index);
+		ESP8266_Set(atBuff);	   ////发送字符长度  
+	}else if(Cnt1 >= 10)
+	{
+		Cnt1 = 0;	
+		esp8266_UART1_Send_String_Demo(buff);		
+	}		
+}
+
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);		
+	  delay_ms(500);
+	  Esp8266_init();
+    LCD1602_Init_Demo();
+	  Lcd1602_Display_String(0,0,(u8*)"hello world");	
+    while(1)
+    {
+			//接收到的数据为 +IPD,0,1:A
+			if(a1=='A')
+			{
+				
+				Lcd1602_Display_String(1,0,(u8*)"A");
+				a1=0;
+			}
+			//接收到的数据为 +IPD,0,1:B
+			if(a1=='B')
+			{
+				
+				Lcd1602_Display_String(1,0,(u8*)"B");
+				a1=0;
+			}
+			//接收到的数据为 +IPD,0,1:C
+			if(a1=='C')
+			{
+				
+				Lcd1602_Display_String(1,0,(u8*)"C");
+				a1=0;
+			}			
+      EPS8266_Send();
+			delay_ms(100);
+    }
+}
+
+
+
+上位机
+
+unsigned char buff[30];
+void EPS8266_Send(void)
+{
+	static unsigned char Cnt1 = 1;
+  if(++Cnt1 == 5)
+	{
+		//IP为192.168.4.1 ，端口号为 5000
+		//ESP8266_Set 已经有加/r/n了AT+CIPSEND=0,26后要加回车，26为发送的长度，数量一定要准
+		ESP8266_Set((u8*)"AT+CIPSEND=0,16");	   ////发送字符长度  
+	}else if(Cnt1 >= 10)
+	{
+
+		Cnt1 = 0;
+		buff[0]= 'H';
+		buff[1]= ',';
+		buff[2]= 123/100%10+0x30;
+		buff[3]= 123/10%10+0x30;
+		buff[4]= '.';
+		buff[5]= 123%10+0x30;
+		buff[6]= ',';
+		buff[7]= 456/100%10+0x30;
+		buff[8]= 456/10%10+0x30;
+		buff[9]= 456%10+0x30;
+		buff[10]= ',';
+		buff[11]= 789/100%10+0x30;
+		buff[12]= 789/10%10+0x30;
+		buff[13]= 789%10+0x30;
+		buff[14]= ',';			
+		buff[15]= 'E';	
+			
+		esp8266_UART1_Send_String_Demo(buff);		
+	}	
+}
+
+
+int main(void)
+{
+	
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);	
+	  delay_ms(500);
+    Esp8266_init();
+	  OLED_Init3_Demo();
+    while(1)
+    {
+			if(a1=='A')
+			{
+				a1=0;
+       OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"A               ");
+			}
+			if(a1=='B')
+			{
+				a1=0;
+       OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"B               ");
+			}
+			if(a1=='C')
+			{
+				a1=0;
+       OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"C               ");
+			}			
+		  EPS8266_Send();
+			delay_ms(100);
+    }
+}
+
+
+**/
+#endif
+
+#if CONFIG_MPU6050 == ENABLED
+
+/*DEMO
+//用来测试是否摔倒的
+
+	MPU6050ReadAcc(Accel);
+		
+	if(Accel[2] <= 60) //跌倒检测
+	{
+
+	}
+	else
+	{
+		
+		SMS_Delay_Cnt = 0;
+	}
+	
+
+short Accel[3];
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);		
+	  delay_ms(500);
+		MPU6050_Init();
+    LCD1602_Init_Demo();
+	  Lcd1602_Display_String(0,0,(u8*)"hello world");
+    while(1)
+    {
+      MPU6050ReadAcc(Accel);
+			Lcd1602_Display_Three_bit(1,0,Accel[0]);
+			Lcd1602_Display_Three_bit(1,5,Accel[1]);
+			Lcd1602_Display_Three_bit(1,10,Accel[2]);
+			delay_ms(100);
+    }
+}
+*/
+
+
+//如果移植程序时只要改一下三个地方就行了
+#define I2C_SCL GPIO_Pin_6
+#define I2C_SDA GPIO_Pin_7
+#define GPIO_I2C GPIOA
+#define RCC_GPIO RCC_APB2Periph_GPIOA
+
+#define I2C_SCL_H GPIO_SetBits(GPIO_I2C,I2C_SCL)
+#define I2C_SCL_L GPIO_ResetBits(GPIO_I2C,I2C_SCL)
+
+#define I2C_SDA_H GPIO_SetBits(GPIO_I2C,I2C_SDA)
+#define I2C_SDA_L GPIO_ResetBits(GPIO_I2C,I2C_SDA)
+
+void MPU6050_Init(void);
+void MPU6050ReadAcc(short *accData);
+void MPU6050ReadGyro(short *gyroData);
+void MPU6050ReadTemp(short *tempData);
+
+// MPU6050, Standard address 0x68
+#define MPU6050_ADDRESS         0x68
+#define MPU6050_WHO_AM_I        0x75
+#define MPU6050_SMPLRT_DIV      0  //8000Hz
+#define MPU6050_DLPF_CFG        0
+#define MPU6050_GYRO_OUT        0x43     //MPU6050陀螺仪数据寄存器地址
+#define MPU6050_ACC_OUT         0x3B     //MPU6050加速度数据寄存器地址
+
+#define MPU6050_SLAVE_ADDRESS  0xd0      //MPU6050器件读地址
+//#define MPU6050_SLAVE_ADDRESS		0x68
+
+#define MPU6050_ADDRESS_AD0_LOW     0x68 // address pin low (GND), default for InvenSense evaluation board
+#define MPU6050_ADDRESS_AD0_HIGH    0x69 // address pin high (VCC)
+#define MPU6050_DEFAULT_ADDRESS     MPU6050_ADDRESS_AD0_LOW
+
+#define MPU6050_RA_XG_OFFS_TC       0x00 //[7] PWR_MODE, [6:1] XG_OFFS_TC, [0] OTP_BNK_VLD
+#define MPU6050_RA_YG_OFFS_TC       0x01 //[7] PWR_MODE, [6:1] YG_OFFS_TC, [0] OTP_BNK_VLD
+#define MPU6050_RA_ZG_OFFS_TC       0x02 //[7] PWR_MODE, [6:1] ZG_OFFS_TC, [0] OTP_BNK_VLD
+#define MPU6050_RA_X_FINE_GAIN      0x03 //[7:0] X_FINE_GAIN
+#define MPU6050_RA_Y_FINE_GAIN      0x04 //[7:0] Y_FINE_GAIN
+#define MPU6050_RA_Z_FINE_GAIN      0x05 //[7:0] Z_FINE_GAIN
+#define MPU6050_RA_XA_OFFS_H        0x06 //[15:0] XA_OFFS
+#define MPU6050_RA_XA_OFFS_L_TC     0x07
+#define MPU6050_RA_YA_OFFS_H        0x08 //[15:0] YA_OFFS
+#define MPU6050_RA_YA_OFFS_L_TC     0x09
+#define MPU6050_RA_ZA_OFFS_H        0x0A //[15:0] ZA_OFFS
+#define MPU6050_RA_ZA_OFFS_L_TC     0x0B
+#define MPU6050_RA_XG_OFFS_USRH     0x13 //[15:0] XG_OFFS_USR
+#define MPU6050_RA_XG_OFFS_USRL     0x14
+#define MPU6050_RA_YG_OFFS_USRH     0x15 //[15:0] YG_OFFS_USR
+#define MPU6050_RA_YG_OFFS_USRL     0x16
+#define MPU6050_RA_ZG_OFFS_USRH     0x17 //[15:0] ZG_OFFS_USR
+#define MPU6050_RA_ZG_OFFS_USRL     0x18
+#define MPU6050_RA_SMPLRT_DIV       0x19
+#define MPU6050_RA_CONFIG           0x1A
+#define MPU6050_RA_GYRO_CONFIG      0x1B
+#define MPU6050_RA_ACCEL_CONFIG     0x1C
+#define MPU6050_RA_FF_THR           0x1D
+#define MPU6050_RA_FF_DUR           0x1E
+#define MPU6050_RA_MOT_THR          0x1F
+#define MPU6050_RA_MOT_DUR          0x20
+#define MPU6050_RA_ZRMOT_THR        0x21
+#define MPU6050_RA_ZRMOT_DUR        0x22
+#define MPU6050_RA_FIFO_EN          0x23
+#define MPU6050_RA_I2C_MST_CTRL     0x24
+#define MPU6050_RA_I2C_SLV0_ADDR    0x25
+#define MPU6050_RA_I2C_SLV0_REG     0x26
+#define MPU6050_RA_I2C_SLV0_CTRL    0x27
+#define MPU6050_RA_I2C_SLV1_ADDR    0x28
+#define MPU6050_RA_I2C_SLV1_REG     0x29
+#define MPU6050_RA_I2C_SLV1_CTRL    0x2A
+#define MPU6050_RA_I2C_SLV2_ADDR    0x2B
+#define MPU6050_RA_I2C_SLV2_REG     0x2C
+#define MPU6050_RA_I2C_SLV2_CTRL    0x2D
+#define MPU6050_RA_I2C_SLV3_ADDR    0x2E
+#define MPU6050_RA_I2C_SLV3_REG     0x2F
+#define MPU6050_RA_I2C_SLV3_CTRL    0x30
+#define MPU6050_RA_I2C_SLV4_ADDR    0x31
+#define MPU6050_RA_I2C_SLV4_REG     0x32
+#define MPU6050_RA_I2C_SLV4_DO      0x33
+#define MPU6050_RA_I2C_SLV4_CTRL    0x34
+#define MPU6050_RA_I2C_SLV4_DI      0x35
+#define MPU6050_RA_I2C_MST_STATUS   0x36
+#define MPU6050_RA_INT_PIN_CFG      0x37
+#define MPU6050_RA_INT_ENABLE       0x38
+#define MPU6050_RA_DMP_INT_STATUS   0x39
+#define MPU6050_RA_INT_STATUS       0x3A
+#define MPU6050_RA_ACCEL_XOUT_H     0x3B
+#define MPU6050_RA_ACCEL_XOUT_L     0x3C
+#define MPU6050_RA_ACCEL_YOUT_H     0x3D
+#define MPU6050_RA_ACCEL_YOUT_L     0x3E
+#define MPU6050_RA_ACCEL_ZOUT_H     0x3F
+#define MPU6050_RA_ACCEL_ZOUT_L     0x40
+#define MPU6050_RA_TEMP_OUT_H       0x41
+#define MPU6050_RA_TEMP_OUT_L       0x42
+#define MPU6050_RA_GYRO_XOUT_H      0x43
+#define MPU6050_RA_GYRO_XOUT_L      0x44
+#define MPU6050_RA_GYRO_YOUT_H      0x45
+#define MPU6050_RA_GYRO_YOUT_L      0x46
+#define MPU6050_RA_GYRO_ZOUT_H      0x47
+#define MPU6050_RA_GYRO_ZOUT_L      0x48
+#define MPU6050_RA_EXT_SENS_DATA_00 0x49
+#define MPU6050_RA_EXT_SENS_DATA_01 0x4A
+#define MPU6050_RA_EXT_SENS_DATA_02 0x4B
+#define MPU6050_RA_EXT_SENS_DATA_03 0x4C
+#define MPU6050_RA_EXT_SENS_DATA_04 0x4D
+#define MPU6050_RA_EXT_SENS_DATA_05 0x4E
+#define MPU6050_RA_EXT_SENS_DATA_06 0x4F
+#define MPU6050_RA_EXT_SENS_DATA_07 0x50
+#define MPU6050_RA_EXT_SENS_DATA_08 0x51
+#define MPU6050_RA_EXT_SENS_DATA_09 0x52
+#define MPU6050_RA_EXT_SENS_DATA_10 0x53
+#define MPU6050_RA_EXT_SENS_DATA_11 0x54
+#define MPU6050_RA_EXT_SENS_DATA_12 0x55
+#define MPU6050_RA_EXT_SENS_DATA_13 0x56
+#define MPU6050_RA_EXT_SENS_DATA_14 0x57
+#define MPU6050_RA_EXT_SENS_DATA_15 0x58
+#define MPU6050_RA_EXT_SENS_DATA_16 0x59
+#define MPU6050_RA_EXT_SENS_DATA_17 0x5A
+#define MPU6050_RA_EXT_SENS_DATA_18 0x5B
+#define MPU6050_RA_EXT_SENS_DATA_19 0x5C
+#define MPU6050_RA_EXT_SENS_DATA_20 0x5D
+#define MPU6050_RA_EXT_SENS_DATA_21 0x5E
+#define MPU6050_RA_EXT_SENS_DATA_22 0x5F
+#define MPU6050_RA_EXT_SENS_DATA_23 0x60
+#define MPU6050_RA_MOT_DETECT_STATUS    0x61
+#define MPU6050_RA_I2C_SLV0_DO      0x63
+#define MPU6050_RA_I2C_SLV1_DO      0x64
+#define MPU6050_RA_I2C_SLV2_DO      0x65
+#define MPU6050_RA_I2C_SLV3_DO      0x66
+#define MPU6050_RA_I2C_MST_DELAY_CTRL   0x67
+#define MPU6050_RA_SIGNAL_PATH_RESET    0x68
+#define MPU6050_RA_MOT_DETECT_CTRL      0x69
+#define MPU6050_RA_USER_CTRL        0x6A
+#define MPU6050_RA_PWR_MGMT_1       0x6B
+#define MPU6050_RA_PWR_MGMT_2       0x6C
+#define MPU6050_RA_BANK_SEL         0x6D
+#define MPU6050_RA_MEM_START_ADDR   0x6E
+#define MPU6050_RA_MEM_R_W          0x6F
+#define MPU6050_RA_DMP_CFG_1        0x70
+#define MPU6050_RA_DMP_CFG_2        0x71
+#define MPU6050_RA_FIFO_COUNTH      0x72
+#define MPU6050_RA_FIFO_COUNTL      0x73
+#define MPU6050_RA_FIFO_R_W         0x74
+#define MPU6050_RA_WHO_AM_I         0x75
+
+#define MPU6050_TC_PWR_MODE_BIT     7
+#define MPU6050_TC_OFFSET_BIT       6
+#define MPU6050_TC_OFFSET_LENGTH    6
+#define MPU6050_TC_OTP_BNK_VLD_BIT  0
+
+#define MPU6050_VDDIO_LEVEL_VLOGIC  0
+#define MPU6050_VDDIO_LEVEL_VDD     1
+
+#define MPU6050_CFG_EXT_SYNC_SET_BIT    5
+#define MPU6050_CFG_EXT_SYNC_SET_LENGTH 3
+#define MPU6050_CFG_DLPF_CFG_BIT    2
+#define MPU6050_CFG_DLPF_CFG_LENGTH 3
+
+#define MPU6050_EXT_SYNC_DISABLED       0x0
+#define MPU6050_EXT_SYNC_TEMP_OUT_L     0x1
+#define MPU6050_EXT_SYNC_GYRO_XOUT_L    0x2
+#define MPU6050_EXT_SYNC_GYRO_YOUT_L    0x3
+#define MPU6050_EXT_SYNC_GYRO_ZOUT_L    0x4
+#define MPU6050_EXT_SYNC_ACCEL_XOUT_L   0x5
+#define MPU6050_EXT_SYNC_ACCEL_YOUT_L   0x6
+#define MPU6050_EXT_SYNC_ACCEL_ZOUT_L   0x7
+
+#define MPU6050_DLPF_BW_256         0x00
+#define MPU6050_DLPF_BW_188         0x01
+#define MPU6050_DLPF_BW_98          0x02
+#define MPU6050_DLPF_BW_42          0x03
+#define MPU6050_DLPF_BW_20          0x04
+#define MPU6050_DLPF_BW_10          0x05
+#define MPU6050_DLPF_BW_5           0x06
+
+#define MPU6050_GCONFIG_FS_SEL_BIT      4
+#define MPU6050_GCONFIG_FS_SEL_LENGTH   2
+
+#define MPU6050_GYRO_FS_250         0x00
+#define MPU6050_GYRO_FS_500         0x01
+#define MPU6050_GYRO_FS_1000        0x02
+#define MPU6050_GYRO_FS_2000        0x03
+
+#define MPU6050_ACONFIG_XA_ST_BIT           7
+#define MPU6050_ACONFIG_YA_ST_BIT           6
+#define MPU6050_ACONFIG_ZA_ST_BIT           5
+#define MPU6050_ACONFIG_AFS_SEL_BIT         4
+#define MPU6050_ACONFIG_AFS_SEL_LENGTH      2
+#define MPU6050_ACONFIG_ACCEL_HPF_BIT       2
+#define MPU6050_ACONFIG_ACCEL_HPF_LENGTH    3
+
+#define MPU6050_ACCEL_FS_2          0x00
+#define MPU6050_ACCEL_FS_4          0x01
+#define MPU6050_ACCEL_FS_8          0x02
+#define MPU6050_ACCEL_FS_16         0x03
+
+#define MPU6050_DHPF_RESET          0x00
+#define MPU6050_DHPF_5              0x01
+#define MPU6050_DHPF_2P5            0x02
+#define MPU6050_DHPF_1P25           0x03
+#define MPU6050_DHPF_0P63           0x04
+#define MPU6050_DHPF_HOLD           0x07
+
+#define MPU6050_TEMP_FIFO_EN_BIT    7
+#define MPU6050_XG_FIFO_EN_BIT      6
+#define MPU6050_YG_FIFO_EN_BIT      5
+#define MPU6050_ZG_FIFO_EN_BIT      4
+#define MPU6050_ACCEL_FIFO_EN_BIT   3
+#define MPU6050_SLV2_FIFO_EN_BIT    2
+#define MPU6050_SLV1_FIFO_EN_BIT    1
+#define MPU6050_SLV0_FIFO_EN_BIT    0
+
+#define MPU6050_MULT_MST_EN_BIT     7
+#define MPU6050_WAIT_FOR_ES_BIT     6
+#define MPU6050_SLV_3_FIFO_EN_BIT   5
+#define MPU6050_I2C_MST_P_NSR_BIT   4
+#define MPU6050_I2C_MST_CLK_BIT     3
+#define MPU6050_I2C_MST_CLK_LENGTH  4
+
+#define MPU6050_CLOCK_DIV_348       0x0
+#define MPU6050_CLOCK_DIV_333       0x1
+#define MPU6050_CLOCK_DIV_320       0x2
+#define MPU6050_CLOCK_DIV_308       0x3
+#define MPU6050_CLOCK_DIV_296       0x4
+#define MPU6050_CLOCK_DIV_286       0x5
+#define MPU6050_CLOCK_DIV_276       0x6
+#define MPU6050_CLOCK_DIV_267       0x7
+#define MPU6050_CLOCK_DIV_258       0x8
+#define MPU6050_CLOCK_DIV_500       0x9
+#define MPU6050_CLOCK_DIV_471       0xA
+#define MPU6050_CLOCK_DIV_444       0xB
+#define MPU6050_CLOCK_DIV_421       0xC
+#define MPU6050_CLOCK_DIV_400       0xD
+#define MPU6050_CLOCK_DIV_381       0xE
+#define MPU6050_CLOCK_DIV_364       0xF
+
+#define MPU6050_I2C_SLV_RW_BIT      7
+#define MPU6050_I2C_SLV_ADDR_BIT    6
+#define MPU6050_I2C_SLV_ADDR_LENGTH 7
+#define MPU6050_I2C_SLV_EN_BIT      7
+#define MPU6050_I2C_SLV_BYTE_SW_BIT 6
+#define MPU6050_I2C_SLV_REG_DIS_BIT 5
+#define MPU6050_I2C_SLV_GRP_BIT     4
+#define MPU6050_I2C_SLV_LEN_BIT     3
+#define MPU6050_I2C_SLV_LEN_LENGTH  4
+
+#define MPU6050_I2C_SLV4_RW_BIT         7
+#define MPU6050_I2C_SLV4_ADDR_BIT       6
+#define MPU6050_I2C_SLV4_ADDR_LENGTH    7
+#define MPU6050_I2C_SLV4_EN_BIT         7
+#define MPU6050_I2C_SLV4_INT_EN_BIT     6
+#define MPU6050_I2C_SLV4_REG_DIS_BIT    5
+#define MPU6050_I2C_SLV4_MST_DLY_BIT    4
+#define MPU6050_I2C_SLV4_MST_DLY_LENGTH 5
+
+#define MPU6050_MST_PASS_THROUGH_BIT    7
+#define MPU6050_MST_I2C_SLV4_DONE_BIT   6
+#define MPU6050_MST_I2C_LOST_ARB_BIT    5
+#define MPU6050_MST_I2C_SLV4_NACK_BIT   4
+#define MPU6050_MST_I2C_SLV3_NACK_BIT   3
+#define MPU6050_MST_I2C_SLV2_NACK_BIT   2
+#define MPU6050_MST_I2C_SLV1_NACK_BIT   1
+#define MPU6050_MST_I2C_SLV0_NACK_BIT   0
+
+#define MPU6050_INTCFG_INT_LEVEL_BIT        7
+#define MPU6050_INTCFG_INT_OPEN_BIT         6
+#define MPU6050_INTCFG_LATCH_INT_EN_BIT     5
+#define MPU6050_INTCFG_INT_RD_CLEAR_BIT     4
+#define MPU6050_INTCFG_FSYNC_INT_LEVEL_BIT  3
+#define MPU6050_INTCFG_FSYNC_INT_EN_BIT     2
+#define MPU6050_INTCFG_I2C_BYPASS_EN_BIT    1
+#define MPU6050_INTCFG_CLKOUT_EN_BIT        0
+
+#define MPU6050_INTMODE_ACTIVEHIGH  0x00
+#define MPU6050_INTMODE_ACTIVELOW   0x01
+
+#define MPU6050_INTDRV_PUSHPULL     0x00
+#define MPU6050_INTDRV_OPENDRAIN    0x01
+
+#define MPU6050_INTLATCH_50USPULSE  0x00
+#define MPU6050_INTLATCH_WAITCLEAR  0x01
+
+#define MPU6050_INTCLEAR_STATUSREAD 0x00
+#define MPU6050_INTCLEAR_ANYREAD    0x01
+
+#define MPU6050_INTERRUPT_FF_BIT            7
+#define MPU6050_INTERRUPT_MOT_BIT           6
+#define MPU6050_INTERRUPT_ZMOT_BIT          5
+#define MPU6050_INTERRUPT_FIFO_OFLOW_BIT    4
+#define MPU6050_INTERRUPT_I2C_MST_INT_BIT   3
+#define MPU6050_INTERRUPT_PLL_RDY_INT_BIT   2
+#define MPU6050_INTERRUPT_DMP_INT_BIT       1
+#define MPU6050_INTERRUPT_DATA_RDY_BIT      0
+
+// TODO: figure out what these actually do
+// UMPL source code is not very obivous
+#define MPU6050_DMPINT_5_BIT            5
+#define MPU6050_DMPINT_4_BIT            4
+#define MPU6050_DMPINT_3_BIT            3
+#define MPU6050_DMPINT_2_BIT            2
+#define MPU6050_DMPINT_1_BIT            1
+#define MPU6050_DMPINT_0_BIT            0
+
+#define MPU6050_MOTION_MOT_XNEG_BIT     7
+#define MPU6050_MOTION_MOT_XPOS_BIT     6
+#define MPU6050_MOTION_MOT_YNEG_BIT     5
+#define MPU6050_MOTION_MOT_YPOS_BIT     4
+#define MPU6050_MOTION_MOT_ZNEG_BIT     3
+#define MPU6050_MOTION_MOT_ZPOS_BIT     2
+#define MPU6050_MOTION_MOT_ZRMOT_BIT    0
+
+#define MPU6050_DELAYCTRL_DELAY_ES_SHADOW_BIT   7
+#define MPU6050_DELAYCTRL_I2C_SLV4_DLY_EN_BIT   4
+#define MPU6050_DELAYCTRL_I2C_SLV3_DLY_EN_BIT   3
+#define MPU6050_DELAYCTRL_I2C_SLV2_DLY_EN_BIT   2
+#define MPU6050_DELAYCTRL_I2C_SLV1_DLY_EN_BIT   1
+#define MPU6050_DELAYCTRL_I2C_SLV0_DLY_EN_BIT   0
+
+#define MPU6050_PATHRESET_GYRO_RESET_BIT    2
+#define MPU6050_PATHRESET_ACCEL_RESET_BIT   1
+#define MPU6050_PATHRESET_TEMP_RESET_BIT    0
+
+#define MPU6050_DETECT_ACCEL_ON_DELAY_BIT       5
+#define MPU6050_DETECT_ACCEL_ON_DELAY_LENGTH    2
+#define MPU6050_DETECT_FF_COUNT_BIT             3
+#define MPU6050_DETECT_FF_COUNT_LENGTH          2
+#define MPU6050_DETECT_MOT_COUNT_BIT            1
+#define MPU6050_DETECT_MOT_COUNT_LENGTH         2
+
+#define MPU6050_DETECT_DECREMENT_RESET  0x0
+#define MPU6050_DETECT_DECREMENT_1      0x1
+#define MPU6050_DETECT_DECREMENT_2      0x2
+#define MPU6050_DETECT_DECREMENT_4      0x3
+
+#define MPU6050_USERCTRL_DMP_EN_BIT             7
+#define MPU6050_USERCTRL_FIFO_EN_BIT            6
+#define MPU6050_USERCTRL_I2C_MST_EN_BIT         5
+#define MPU6050_USERCTRL_I2C_IF_DIS_BIT         4
+#define MPU6050_USERCTRL_DMP_RESET_BIT          3
+#define MPU6050_USERCTRL_FIFO_RESET_BIT         2
+#define MPU6050_USERCTRL_I2C_MST_RESET_BIT      1
+#define MPU6050_USERCTRL_SIG_COND_RESET_BIT     0
+
+#define MPU6050_PWR1_DEVICE_RESET_BIT   7
+#define MPU6050_PWR1_SLEEP_BIT          6
+#define MPU6050_PWR1_CYCLE_BIT          5
+#define MPU6050_PWR1_TEMP_DIS_BIT       3
+#define MPU6050_PWR1_CLKSEL_BIT         2
+#define MPU6050_PWR1_CLKSEL_LENGTH      3
+
+#define MPU6050_CLOCK_INTERNAL          0x00
+#define MPU6050_CLOCK_PLL_XGYRO         0x01
+#define MPU6050_CLOCK_PLL_YGYRO         0x02
+#define MPU6050_CLOCK_PLL_ZGYRO         0x03
+#define MPU6050_CLOCK_PLL_EXT32K        0x04
+#define MPU6050_CLOCK_PLL_EXT19M        0x05
+#define MPU6050_CLOCK_KEEP_RESET        0x07
+
+#define MPU6050_PWR2_LP_WAKE_CTRL_BIT       7
+#define MPU6050_PWR2_LP_WAKE_CTRL_LENGTH    2
+#define MPU6050_PWR2_STBY_XA_BIT            5
+#define MPU6050_PWR2_STBY_YA_BIT            4
+#define MPU6050_PWR2_STBY_ZA_BIT            3
+#define MPU6050_PWR2_STBY_XG_BIT            2
+#define MPU6050_PWR2_STBY_YG_BIT            1
+#define MPU6050_PWR2_STBY_ZG_BIT            0
+
+#define MPU6050_WAKE_FREQ_1P25      0x0
+#define MPU6050_WAKE_FREQ_2P5       0x1
+#define MPU6050_WAKE_FREQ_5         0x2
+#define MPU6050_WAKE_FREQ_10        0x3
+
+#define MPU6050_BANKSEL_PRFTCH_EN_BIT       6
+#define MPU6050_BANKSEL_CFG_USER_BANK_BIT   5
+#define MPU6050_BANKSEL_MEM_SEL_BIT         4
+#define MPU6050_BANKSEL_MEM_SEL_LENGTH      5
+
+#define MPU6050_WHO_AM_I_BIT        6
+#define MPU6050_WHO_AM_I_LENGTH     6
+
+#define MPU6050_DMP_MEMORY_BANKS        8
+#define MPU6050_DMP_MEMORY_BANK_SIZE    256
+#define MPU6050_DMP_MEMORY_CHUNK_SIZE   16
+
+void MPU6050ReadTemp(short *tempData);
+void MPU6050ReadGyro(short *gyroData);
+void MPU6050ReadAcc(short *accData);
+void MPU6050_ReturnTemp(short*Temperature);
+void MPU6050_Init(void);
+void MPU6050ReadID(void);
+void PMU6050_ReadData(u8 reg_add,unsigned char*Read,u8 num);
+void PMU6050_WriteReg(u8 reg_add,u8 reg_dat);
+
+void MPU6050_PWR_MGMT_1_INIT(void);
+
+
+
+void MPU6050_pro(void);
+extern short Accel[3];
+
+
+#endif
+
+
+#if CONFIG_GSM_TXRX == ENABLED
+
+/*demo
+//使用到了串口3跟定时器3
+u8 PhoneNO[12]="18273129689";
+u8 send_buff[20]="hello";
+unsigned char Menu_Count =0;
+
+//发送短信
+SMS_Retry = 5;
+SMS_States_Register |= (1 << SMS_TXD_ENA); //发送短信
+
+//接收数据后，发送短信
+if(send_flag==1)
+{
+	//等待短信接收完成
+	delay_ms(1000);
+	send_flag=0;
+	SMS_Retry = 5;
+	SMS_States_Register |= (1 << SMS_TXD_ENA); //发送短信
+}
+
+SMS_Processing(PhoneNO,send_buff);
+
+void Key_Process_Demo(unsigned char Key_value)
+{
+
+	if(Key_value == 1 || send_flag==1 )	 //设置键
+	{
+		//等待短信接收完成
+		delay_ms(1000);
+		send_flag=0;
+		SMS_Retry = 5;
+		SMS_States_Register |= (1 << SMS_TXD_ENA); //发送短信
+		Lcd1602_Display_String(1,0,"h");
+		
+		switch(Menu_Count)
+		{
+			case 1:
+			OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"                   ");
+			OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"                   ");
+			OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                   ");
+			OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                   ");					
+				OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"号码设置:           ");
+			  OLED_ShowStr_ENCH_Demo(0,16,PhoneNO);
+			  OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"^");
+			  
+				break;
+			case 2:
+				OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)" ");
+			  OLED_ShowStr_ENCH_Demo(8,32,(unsigned char *)"^");
+				break;
+			case 3:
+				OLED_ShowStr_ENCH_Demo(8,32,(unsigned char *)" ");
+			  OLED_ShowStr_ENCH_Demo(8*2,32,(unsigned char *)"^");
+				break;
+			case 4:
+				OLED_ShowStr_ENCH_Demo(8*2,32,(unsigned char *)" ");
+			  OLED_ShowStr_ENCH_Demo(8*3,32,(unsigned char *)"^");
+				break;
+			case 5:
+				OLED_ShowStr_ENCH_Demo(8*3,32,(unsigned char *)" ");
+			  OLED_ShowStr_ENCH_Demo(8*4,32,(unsigned char *)"^");
+				break;
+			case 6:
+				OLED_ShowStr_ENCH_Demo(8*4,32,(unsigned char *)" ");
+			  OLED_ShowStr_ENCH_Demo(8*5,32,(unsigned char *)"^");
+				break;
+			case 7:
+				OLED_ShowStr_ENCH_Demo(8*5,32,(unsigned char *)" ");
+			  OLED_ShowStr_ENCH_Demo(8*6,32,(unsigned char *)"^");
+				break;
+			case 8:
+				OLED_ShowStr_ENCH_Demo(8*6,32,(unsigned char *)" ");
+			  OLED_ShowStr_ENCH_Demo(8*7,32,(unsigned char *)"^");
+				break;
+			case 9:
+				OLED_ShowStr_ENCH_Demo(8*7,32,(unsigned char *)" ");
+			  OLED_ShowStr_ENCH_Demo(8*8,32,(unsigned char *)"^");
+				break;
+			case 10:
+				OLED_ShowStr_ENCH_Demo(8*8,32,(unsigned char *)" ");
+			  OLED_ShowStr_ENCH_Demo(8*9,32,(unsigned char *)"^");
+				break;
+			case 11:
+				OLED_ShowStr_ENCH_Demo(8*9,32,(unsigned char *)" ");
+			  OLED_ShowStr_ENCH_Demo(8*10,32,(unsigned char *)"^");
+				break;			
+		}		
+	}
+
+	if(Key_value == 2)	 //
+	{
+		if(Menu_Count>=1 && Menu_Count<=11)
+		{
+			if(PhoneNO[Menu_Count-1]<'9')
+			{
+				PhoneNO[Menu_Count-1]++;
+				OLED_ShowStr_ENCH_Demo(0,16,PhoneNO);
+			}
+		}
+		Lcd1602_Display_String(1,0,"2");
+	}
+	
+	if(Key_value == 3)	 //
+	{
+		if(Menu_Count>=1 && Menu_Count<=11)
+		{
+			if(PhoneNO[Menu_Count-1]>'0')
+			{
+				PhoneNO[Menu_Count-1]--;
+				OLED_ShowStr_ENCH_Demo(0,16,PhoneNO);
+			}
+		}		
+		switch(Menu_Count)
+		{
+			case 1:
+				break;
+			case 2:
+				break;
+		}
+	}		
+		
+}
+
+void GSM_CALL(void)
+{
+		gsm_usart3_SendString_Demo((u8*)" AT+CMGF=1\r\n");	
+		
+		delay_ms(1000);
+		
+		gsm_usart3_SendString_Demo((u8*)"AT+CSCS=\"GSM\"\r\n");	
+		
+		delay_ms(1000);
+		
+		gsm_usart3_SendString_Demo((u8*)"atd");	//信息发送指令 AT+CMGS=//
+		gsm_usart3_SendString_Demo(PhoneNO);   
+		gsm_usart3_send_byte_Demo(';');
+		gsm_usart3_send_byte_Demo('\r');			//发送回车指令//
+		gsm_usart3_send_byte_Demo('\n');			//发送回车指令//
+						
+		delay_ms(1000);		
+}
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);		
+	  delay_ms(500);
+	  KEY_Init_Demo();
+    gsm_txrx_init();
+	  //uart1_init_Demo(9600);
+    LCD1602_Init_Demo();
+	  Lcd1602_Display_String(0,0,(u8*)"hello world");	
+    while(1)
+    {
+			//printf("%s",UART3_RXD);
+      Key_value_Demo(Key_Process_Demo);
+			SMS_Processing(PhoneNO,send_buff);
+			delay_ms(100);
+    }
+}
+
+
+
+*/
+#include <string.h>
+//接收时间太短，数据容易丢失
+#define UART3_RXD_TIME       20  //定义串口超时时间 20*20ms
+
+#define UART3_RXD_SIZE     128
+#define UART3_RXD_END        0
+#define GPRS_AT_CREG             0  //注册成功 标志位
+#define GPRS_SEND_DATA           1  //有GPRS数据需要发送的时候置为 1  
+#define GPRS_CCLK_OK             2
+#define GPRS_RXD_DATA            3
+
+#define CMD_READY          0
+#define CMD_OK             1
+#define CMD_WaitData       2
+#define CMD_SendOK         3
+#define CMD_CREG           4
+#define CMD_CGATT1         5
+#define CMD_CGATT0         6
+#define CMD_ERROR          7
+
+#define CMD_CONNECT_OK     8
+#define CMD_CLOSE          9
+#define CMD_RING           10
+#define CMD_CSQ            11
+#define CMD_CCLK           12
+#define CMD_SHUT_OK        13
+
+#define CMD_RING_NUMBER    14
+#define CMD_NO_CARRIER     15
+
+
+#define GPRS_RETRY      10
+
+
+
+#define SMS_TXD_ENA           0
+
+
+#define SMS_RXD_CMGR          2
+#define SMS_RXD_CMTI          3
+#define SMS_RXD_ENA           4
+#define SMS_RXD_DATA          5
+
+#define SMS_WaitData          0  /*等待数据*/
+#define SMS_RXD_OK            1  /*收到OK*/
+#define SMS_ERROR             2
+#define SMS_CMGS              3
+
+#define SMS_RETYR_CONST     5  /*短消息发送重试次数*/
+extern volatile unsigned char UART3_RXD[UART3_RXD_SIZE];
+extern volatile unsigned char SMS_CMD_Register ;
+extern volatile unsigned char SMS_States_Register;
+extern volatile unsigned char SMS_Retry;
+//接收到数据的句柄
+extern u8 send_flag;
+//网络注册成功
+extern u8 sim_status;
+
+extern u8 PhoneNO[12];
+extern u8 send_buff[20];
+void SMS_Processing(u8* num,u8* data);
+void gsm_txrx_init(void);
+
+
+#endif
+
+#if CONFIG_ADXL345 == ENABLED
+/**demo
+// 只需要接VCC GND  SDK SCL  
+unsigned int BuShu=0;//步数
+unsigned int Normal_num=0;			//正常次数
+unsigned int Error_num=0;			//倾斜次数
+unsigned int disBuShu = 0;  //显示步数
+
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);		
+	  delay_ms(500);
+		//需要放在最下面，不然会不能用？？？
+    Init_ADXL345();
+		if(Single_Read_ADXL345(0X00)==0xe5)	
+		{
+			delay_ms(5);
+		}
+		else
+		{
+			delay_ms(3);
+		}		
+    while(1)
+    {
+				ReadData_x();  						//三轴检测函数
+				if((temp_Y>450)||(temp_Y<-450)) //查看正常次数     
+				{
+					Normal_num++;  //正常次数++
+				}
+				else
+				{
+					Error_num++;//倾斜次数
+				}
+				if((Error_num!=0)&&(Normal_num!=0))//检测到步数
+				{
+					BuShu++;   //步数脉冲量++
+					Error_num=0;    //清除一个周期检测
+					Normal_num=0;
+
+				}
+				disBuShu = BuShu/2;  //显示步数
+				disJuLi = disBuShu*0.45;//显示距离		
+				Lcd1602_Display_Three_bit(1,3,BuShu);	
+				sprintf(dis1,"%4.1f",disJuLi);//打印	
+				Lcd1602_Display_String(1,10,(u8*)dis1);					
+			delay_ms(100);
+    }
+}
+
+
+**/
+#define SDA_RCC_ADXL345			RCC_APB2Periph_GPIOA
+#define SDA_GPIO_ADXL345		GPIOA
+#define SDA_GPIO_PIN_ADXL345	GPIO_Pin_5
+
+#define SCL_RCC_ADXL345			RCC_APB2Periph_GPIOA
+#define SCL_GPIO_ADXL345		GPIOA
+#define SCL_GPIO_PIN_ADXL345	GPIO_Pin_4
+
+#define SCL_OUT_ADXL345() SCL_Set_Output_ADXL345() //置位scl
+#define SET_SCL_ADXL345() GPIO_SetBits(SCL_GPIO_ADXL345, SCL_GPIO_PIN_ADXL345) //置位scl
+#define CLE_SCL_ADXL345() GPIO_ResetBits(SCL_GPIO_ADXL345, SCL_GPIO_PIN_ADXL345)//清楚scl
+                    
+#define SDA_OUT_ADXL345() SDA_Set_Output_ADXL345()
+#define SDA_INT_ADXL345() SDA_Set_Input_ADXL345()
+#define SET_SDA_ADXL345() GPIO_SetBits(SDA_GPIO_ADXL345, SDA_GPIO_PIN_ADXL345)//置位sda
+#define CLE_SDA_ADXL345() GPIO_ResetBits(SDA_GPIO_ADXL345, SDA_GPIO_PIN_ADXL345)//清楚sda
+#define SDA_VAL_ADXL345() GPIO_ReadInputDataBit(SDA_GPIO_ADXL345, SDA_GPIO_PIN_ADXL345)
+
+#define	SlaveAddress   0xA6	  //定义器件在IIC总线中的从地址,根据ALT  ADDRESS地址引脚不同修改                  //ALT  ADDRESS引脚接地时地址为0xA6，接电源时地址为0x3A
+
+extern float temp_X,temp_Y,temp_Z;
+void Init_ADXL345(void);    
+void  Single_Write_ADXL345(unsigned char REG_Address,unsigned char REG_data);   //??????
+unsigned char Single_Read_ADXL345(unsigned char REG_Address);                   //???????????
+void  Multiple_Read_ADXL345(void);                                  //????????????
+void ADXL345_Start(void);
+void ADXL345_Stop(void);
+void ADXL345_SendACK(unsigned char ack);
+unsigned char  ADXL345_RecvACK(void);
+void ADXL345_SendByte(unsigned char dat);
+unsigned char ADXL345_RecvByte(void);
+void ADXL345_ReadPage(void);
+void ADXL345_WritePage(void);
+void ReadData_x(void);
+
+
+#endif
+
+#if CONFIG_CARSPEED == ENABLED
+
+extern unsigned int Speed_dat;
+void Tim4Init(void);
+
+/**DEMO
+//霍尔元件器接PB6，电机上加磁铁
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);		
+	  delay_ms(500);
+	  //接PB6
+	  Tim4Init();
+    while(1)
+    {
+      OLED_ShowNum_fiive_Demo(40,48,Speed_dat);
+			delay_ms(100);
+    }
+}
+
+**/
+#endif
+
+#if CONFIG_RC522 == ENABLED
+/**demo
+
+
+//
+SDA        SCK  MOSI   MISO  IRQ  GND  RST  3.3V
+PB3        PA15 PA12   PA11  不接
+(对应CS)     
+
+
+//要把flash使能
+#include <string.h>
+#define FLASH_SAVE_ADDR  0X0800fe00 				//设置FLASH 保存地址(必须为偶数)
+#define  SIZE 10
+#define MAX_PEOPLE   5 //最大存储10张IC卡
+u8 ID_BUF[8],ID_TEMP_Buffer[10]; //ID_TEMP_Buffer注册过的卡号
+int id_compare;//-1刷卡失败，大于等于0为id值
+void WRITE_DATA_TO_FLASH(u8* ID_Buffer,u8 space)//数据写入STM32内部FLASH
+{
+		  STMFLASH_Write_Demo(FLASH_SAVE_ADDR + 0x10 * space,(u16*)ID_Buffer,SIZE); 
+      delay_ms(100);                             //内部FLASH寿命不长，防止误操作反复擦鞋
+}
+
+void READ_DATA_FOR_FLASH(u8* ID_TEMP_Buffer ,u8 space)//从STM32内部FLASH读出数据
+{
+
+		 STMFLASH_Read_Demo(FLASH_SAVE_ADDR + 0x10 * space,(u16*)ID_TEMP_Buffer,SIZE);
+	 //printf("%s",datatemp);
+
+}
+void CHECK_NEW_MCU(void)  // 检查是否是新的单片机，是的话清空存储区，否则保留
+ {
+	  char comper_str[6],i = 0;
+	  u8 clear_str[10] = {0};
+		memset(clear_str,'0',sizeof(clear_str));//把clear_str这个数组全部清 ‘0’
+	  STMFLASH_Read_Demo(FLASH_SAVE_ADDR+0x10 * (MAX_PEOPLE),(u16*)comper_str,5); //从0X0801F0A0这个地址读出数据 
+	  comper_str[5] = '\0';
+	  if((strstr(comper_str,"FDYDD") == NULL))  //新的单片机
+		{
+				for(i = 0; i < MAX_PEOPLE; i++)//把存卡内部缓存全部清零
+			 {
+					WRITE_DATA_TO_FLASH(clear_str,i);
+			 }
+			 STMFLASH_Write_Demo(FLASH_SAVE_ADDR+ 0x10 * (MAX_PEOPLE),(u16*)"FDYDD",5); //写入“FDYDZ”，方便下次校验
+			 
+			 
+			 
+	  }else
+		{
+			
+			
+		}
+ }
+
+int detect_carid(void)
+{
+	u8 i;
+	
+	for(i = 0; i < MAX_PEOPLE; i++)//从10张IC卡中扫描
+	{
+		READ_DATA_FOR_FLASH(ID_TEMP_Buffer,i);//读取STM32内部FLASH存储的卡号
+		if(strstr((char*)ID_TEMP_Buffer,(char*)ID_BUF) != NULL ) //查找匹配正确
+		{
+			//OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"刷卡成功");
+
+			 return i;
+		}
+		
+	}
+	if(i == MAX_PEOPLE) 
+	{
+		//OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"刷卡失败");
+				 
+	}
+	return -1;
+}
+void input_carid()
+{
+	u8 i;
+	u8 card_detect=0;
+	if(RC522_SCAN(ID_BUF))
+	{
+	 for(i = 0; i < MAX_PEOPLE; i++)//从10张IC卡中扫描
+	 {
+			READ_DATA_FOR_FLASH(ID_TEMP_Buffer,i);//读取STM32内部FLASH存储的卡号
+			if(strstr((char*)ID_TEMP_Buffer,(char*)ID_BUF) != NULL)//检测到相同ID
+			{
+				card_detect=1;
+				break;
+			}
+			if(ID_TEMP_Buffer[0] == '0' )              //ID_TEMP_Buffer第8位是0，说明是没有存储过的 XXXXXXXXD
+			{
+				card_detect=2;
+				break;
+			}  
+	 }
+	 delay_ms(1000);
+	 if(i == MAX_PEOPLE) //数量已满
+	 {
+		 //OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"录入数量已满"); //IC卡号最多存10张，如果等于10，说明之前存过10张卡了。则不能继续注册IC
+
+	 }
+		else
+	 {
+			 if(card_detect==2)//录入成功
+			 {
+				 sprintf((char*)ID_TEMP_Buffer,"%s%d",ID_BUF,1);//把IC卡号拷贝到ID_TEMP_Buffer中，第8位存储1，说明卡号被存储
+				 WRITE_DATA_TO_FLASH(ID_TEMP_Buffer,i);//存储到STM32内部FLASH
+				 //OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"录入成功    ");//显示存储成功
+
+				 //OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)ID_TEMP_Buffer);
+			 }else if(card_detect==1)//录入重复 
+			 {
+
+				 //OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"录入重复    ");
+
+			 }
+			 
+			 
+	 }
+	 card_detect=0;
+	 delay_ms(2000);					 
+	}	
+}
+void delte_carid()
+{
+	u8 i;
+	 //OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"删除中...   ");//显示清空信息				
+	 sprintf((char*)ID_TEMP_Buffer,"%02X%02X%02X%02X%d", 0, 0, 0, 0,0);//ID_TEMP_Buffer缓存全部写入0
+	 for(i = 0; i < MAX_PEOPLE; i++)
+	 {
+		 WRITE_DATA_TO_FLASH(ID_TEMP_Buffer,i);
+		 
+		 
+	 }
+
+	 delay_ms(1000);	
+}
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);		
+	  delay_ms(500);
+	  CHECK_NEW_MCU();
+		RC522_Init();//刷卡初始化
+		PcdReset (); //复位RC522 
+		M500PcdConfigISOType ( 'A' );//设置工作方式	
+    while(1)
+    {
+      if(RC522_SCAN(ID_BUF)) //检测到有卡刷入
+			{
+				id_compare = detect_carid();
+				if(id_compare == -1)
+				{
+					//刷卡失败
+				}else
+				{
+					//刷卡成功
+				}
+			}
+			
+			//录入
+			input_carid();
+			delay_ms(100);
+    }
+}
+
+**/
+
+
+/////////////////////////////////////////////////////////////////////
+//MF522命令字
+/////////////////////////////////////////////////////////////////////
+#define PCD_IDLE              0x00               //取消当前命令
+#define PCD_AUTHENT           0x0E               //验证密钥
+#define PCD_RECEIVE           0x08               //接收数据
+#define PCD_TRANSMIT          0x04               //发送数据
+#define PCD_TRANSCEIVE        0x0C               //发送并接收数据
+#define PCD_RESETPHASE        0x0F               //复位
+#define PCD_CALCCRC           0x03               //CRC计算
+
+/////////////////////////////////////////////////////////////////////
+//Mifare_One卡片命令字
+/////////////////////////////////////////////////////////////////////
+#define PICC_REQIDL           0x26               //寻天线区内未进入休眠状态
+#define PICC_REQALL           0x52               //寻天线区内全部卡
+#define PICC_ANTICOLL1        0x93               //防冲撞
+#define PICC_ANTICOLL2        0x95               //防冲撞
+#define PICC_AUTHENT1A        0x60               //验证A密钥
+#define PICC_AUTHENT1B        0x61               //验证B密钥
+#define PICC_READ             0x30               //读块
+#define PICC_WRITE            0xA0               //写块
+#define PICC_DECREMENT        0xC0               //扣款
+#define PICC_INCREMENT        0xC1               //充值
+#define PICC_RESTORE          0xC2               //调块数据到缓冲区
+#define PICC_TRANSFER         0xB0               //保存缓冲区中数据
+#define PICC_HALT             0x50               //休眠
+
+/////////////////////////////////////////////////////////////////////
+//MF522 FIFO长度定义
+/////////////////////////////////////////////////////////////////////
+#define DEF_FIFO_LENGTH       64                 //FIFO size=64byte
+#define MAXRLEN  18
+
+/////////////////////////////////////////////////////////////////////
+//MF522寄存器定义
+/////////////////////////////////////////////////////////////////////
+// PAGE 0
+#define     RFU00                 0x00    
+#define     CommandReg            0x01    
+#define     ComIEnReg             0x02    
+#define     DivlEnReg             0x03    
+#define     ComIrqReg             0x04    
+#define     DivIrqReg             0x05
+#define     ErrorReg              0x06    
+#define     Status1Reg            0x07    
+#define     Status2Reg            0x08    
+#define     FIFODataReg           0x09
+#define     FIFOLevelReg          0x0A
+#define     WaterLevelReg         0x0B
+#define     ControlReg            0x0C
+#define     BitFramingReg         0x0D
+#define     CollReg               0x0E
+#define     RFU0F                 0x0F
+// PAGE 1     
+#define     RFU10                 0x10
+#define     ModeReg               0x11
+#define     TxModeReg             0x12
+#define     RxModeReg             0x13
+#define     TxControlReg          0x14
+#define     TxAutoReg             0x15
+#define     TxSelReg              0x16
+#define     RxSelReg              0x17
+#define     RxThresholdReg        0x18
+#define     DemodReg              0x19
+#define     RFU1A                 0x1A
+#define     RFU1B                 0x1B
+#define     MifareReg             0x1C
+#define     RFU1D                 0x1D
+#define     RFU1E                 0x1E
+#define     SerialSpeedReg        0x1F
+// PAGE 2    
+#define     RFU20                 0x20  
+#define     CRCResultRegM         0x21
+#define     CRCResultRegL         0x22
+#define     RFU23                 0x23
+#define     ModWidthReg           0x24
+#define     RFU25                 0x25
+#define     RFCfgReg              0x26
+#define     GsNReg                0x27
+#define     CWGsCfgReg            0x28
+#define     ModGsCfgReg           0x29
+#define     TModeReg              0x2A
+#define     TPrescalerReg         0x2B
+#define     TReloadRegH           0x2C
+#define     TReloadRegL           0x2D
+#define     TCounterValueRegH     0x2E
+#define     TCounterValueRegL     0x2F
+// PAGE 3      
+#define     RFU30                 0x30
+#define     TestSel1Reg           0x31
+#define     TestSel2Reg           0x32
+#define     TestPinEnReg          0x33
+#define     TestPinValueReg       0x34
+#define     TestBusReg            0x35
+#define     AutoTestReg           0x36
+#define     VersionReg            0x37
+#define     AnalogTestReg         0x38
+#define     TestDAC1Reg           0x39  
+#define     TestDAC2Reg           0x3A   
+#define     TestADCReg            0x3B   
+#define     RFU3C                 0x3C   
+#define     RFU3D                 0x3D   
+#define     RFU3E                 0x3E   
+#define     RFU3F		  		        0x3F
+
+/////////////////////////////////////////////////////////////////////
+//和MF522通讯时返回的错误代码
+/////////////////////////////////////////////////////////////////////
+#define 	MI_OK                 0x26
+#define 	MI_NOTAGERR           0xcc
+#define 	MI_ERR                0xbb
+
+ 
+ 
+/*********************************** RC522 引脚定义 *********************************************/
+#define               macRC522_GPIO_CS_CLK_FUN                  RCC_APB2PeriphClockCmd
+#define               macRC522_GPIO_CS_CLK                      RCC_APB2Periph_GPIOB
+#define               macRC522_GPIO_CS_PORT    	                GPIOB		   
+#define               macRC522_GPIO_CS_PIN		                  GPIO_Pin_3
+#define               macRC522_GPIO_CS_Mode		                  GPIO_Mode_Out_PP
+
+#define               macRC522_GPIO_SCK_CLK_FUN                 RCC_APB2PeriphClockCmd
+#define               macRC522_GPIO_SCK_CLK                     RCC_APB2Periph_GPIOA
+#define               macRC522_GPIO_SCK_PORT    	              GPIOA			   
+#define               macRC522_GPIO_SCK_PIN		                  GPIO_Pin_15
+#define               macRC522_GPIO_SCK_Mode		                GPIO_Mode_Out_PP
+
+#define               macRC522_GPIO_MOSI_CLK_FUN                RCC_APB2PeriphClockCmd
+#define               macRC522_GPIO_MOSI_CLK                    RCC_APB2Periph_GPIOA
+#define               macRC522_GPIO_MOSI_PORT    	              GPIOA			   
+#define               macRC522_GPIO_MOSI_PIN		                GPIO_Pin_12
+#define               macRC522_GPIO_MOSI_Mode		                GPIO_Mode_Out_PP
+
+#define               macRC522_GPIO_MISO_CLK_FUN                RCC_APB2PeriphClockCmd
+#define               macRC522_GPIO_MISO_CLK                    RCC_APB2Periph_GPIOA
+#define               macRC522_GPIO_MISO_PORT    	              GPIOA		   
+#define               macRC522_GPIO_MISO_PIN		                GPIO_Pin_11
+#define               macRC522_GPIO_MISO_Mode		                GPIO_Mode_IN_FLOATING
+
+#define               macRC522_GPIO_RST_CLK_FUN                 RCC_APB2PeriphClockCmd
+#define               macRC522_GPIO_RST_CLK                     RCC_APB2Periph_GPIOA
+#define               macRC522_GPIO_RST_PORT    	              GPIOA		   
+#define               macRC522_GPIO_RST_PIN		                  GPIO_Pin_8
+#define               macRC522_GPIO_RST_Mode		                GPIO_Mode_Out_PP
+
+
+
+/*********************************** RC522 函数宏定义*********************************************/
+#define          macRC522_CS_Enable()         GPIO_ResetBits ( macRC522_GPIO_CS_PORT, macRC522_GPIO_CS_PIN )
+#define          macRC522_CS_Disable()        GPIO_SetBits   (   macRC522_GPIO_CS_PORT, macRC522_GPIO_CS_PIN )
+
+#define          macRC522_Reset_Enable()      GPIO_ResetBits( macRC522_GPIO_RST_PORT, macRC522_GPIO_RST_PIN )
+#define          macRC522_Reset_Disable()     GPIO_SetBits ( macRC522_GPIO_RST_PORT, macRC522_GPIO_RST_PIN )
+
+#define          macRC522_SCK_0()             GPIO_ResetBits( macRC522_GPIO_SCK_PORT, macRC522_GPIO_SCK_PIN )
+#define          macRC522_SCK_1()             GPIO_SetBits ( macRC522_GPIO_SCK_PORT, macRC522_GPIO_SCK_PIN )
+
+#define          macRC522_MOSI_0()            GPIO_ResetBits( macRC522_GPIO_MOSI_PORT, macRC522_GPIO_MOSI_PIN )
+#define          macRC522_MOSI_1()            GPIO_SetBits ( macRC522_GPIO_MOSI_PORT, macRC522_GPIO_MOSI_PIN )
+
+#define          macRC522_MISO_GET()          GPIO_ReadInputDataBit ( macRC522_GPIO_MISO_PORT, macRC522_GPIO_MISO_PIN )
+
+
+
+/*********************************** 函数 *********************************************/
+void             RC522_Init                   ( void );
+u8 RC522_SCAN(u8* BUF);
+void             PcdReset                   ( void );                       //复位
+void             M500PcdConfigISOType       ( u8 type );                    //工作方式
+char             PcdRequest                 ( u8 req_code, u8 * pTagType ); //寻卡
+char             PcdAnticoll                ( u8 * pSnr);                   //读卡号
+char             IC_CMT                     ( u8 * PID, u8 * KEY, u8 RW, u8 * Dat );
+u8 GET_PID( u8 *PID);
+#define   macRC522_DELAY()  delay_us ( 2 )
+
+
+#endif
+
+#if CONFIG_AS608 == ENABLED
+#define TOUCH PAin(6)
+extern unsigned char   querenma;
+extern unsigned int    PageID;
+#define User 1
+#define buffer1ID  0x01
+#define buffer2ID  0x02
+#define queren  0x10
+#define tuichu  0x0C
+#define shanchu 0x08
+void SFG_GetEcho(void);
+void SFG_getimage(void);
+void SFG_genchar(uint8_t bufferID);
+void SFG_fastsearch(uint8_t bufferID);
+void SFG_enroll(void);
+void SFG_deletchar(uint16_t pageID,u16 N) ;
+void SFG_identify(void);
+void as608_init(void);
+ void USART2SendByte_Demo(unsigned char SendData);
+ 
+/**demo
+
+3.3v   TX     RX     GND   TOUCH   TOUCHVIN   D+   D-
+       A3     A2           PA6     3.3V       不接  不接
+
+
+
+#define MAX_AS       5 //最大存储10张IC卡
+u8 comeon;//按键状态
+u16 user_num[2]={0,0};//刷卡、指纹用户
+
+void Key_Process_Demo(unsigned char Key_value)
+{
+
+	
+	if(Key_value == 4)
+	{
+		comeon=0;
+	}		
+}
+void addfinger(void)
+{
+	if(user_num[1]>=MAX_AS)
+	{
+		 //OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"录入数量已满"); //IC卡号最多存10张，如果等于10，说明之前存过10张卡了。则不能继续注册IC
+
+
+     delay_ms(1000);		
+		 return;
+	}
+  
+  if(TOUCH==1)
+	{    
+	SFG_getimage();	
+	delay_ms(200);	
+	if(querenma==0)
+	{
+	  SFG_genchar(buffer1ID);
+	}
+	SFG_fastsearch(buffer1ID);
+	
+	while(querenma==1)
+	 SFG_fastsearch(buffer1ID);
+	if(querenma==0)
+	{
+
+		//OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"指纹已存储");
+		//OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"按继续键");
+		comeon=1;
+		while(comeon)
+		{
+			//Key_value_Demo(Key_Process_Demo);
+		}
+		
+	}
+	else if(querenma==9)
+		{
+			delay_ms(2000);
+			///OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"再次按手指");
+			//OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"按继续键");
+			comeon=1;
+			while(comeon)
+			{
+				//Key_value_Demo(Key_Process_Demo);
+			}			
+			SFG_enroll();			
+			while(querenma==2)
+			SFG_enroll();
+			if(querenma==0)
+			{ 
+				
+				//OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"指纹录入成功");
+				//OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"编号为: ");
+				//OLED_ShowNum_Three_Demo(16*4,16,PageID);
+				//user_num[1]++;
+
+				//OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"按继续键");
+				comeon=1;
+				while(comeon)
+				{
+					//Key_value_Demo(Key_Process_Demo);
+				}
+
+	  	}
+	  	else if(querenma!=0)
+	  	{
+				//OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"指纹录入失败");
+				//OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"按继续键");
+				comeon=1;
+				while(comeon)
+				{
+					//Key_value_Demo(Key_Process_Demo);
+				}
+				
+	 		}
+				
+   		}
+		}
+}
+void delet()
+{
+	SFG_deletchar(0,MAX_AS);//删除指纹
+}
+void compare()
+{
+		if(TOUCH==1)
+		{ 
+			SFG_identify();
+			if(querenma==0)
+			{
+				//OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"指纹成功");
+
+					//OLED_ShowNum_Three_Demo(16*5,48,PageID);	
+			}else
+			{
+				//OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"指纹失败");
+			}
+		}			
+}
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);		
+	  delay_ms(500);
+		as608_init();//指纹初始化
+    while(1)
+    {
+			addfinger();//录入
+			delet();//删除
+			compare();//匹配	
+			delay_ms(100);
+    }
+}
+
+
+#define MAX_AS       5 //最大存储10张IC卡
+u8 comeon;//按键状态
+u16 user_num[2]={0,0};//刷卡、指纹用户
+
+void Key_Process_Demo(unsigned char Key_value)
+{
+
+	
+	if(Key_value == 4)
+	{
+		comeon=0;
+	}		
+}
+
+void addfinger(void)
+{
+	if(user_num[1]>=MAX_AS)
+	{
+
+		OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"录入数量已满    ");
+		OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"                ");
+		OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+		OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");
+
+     delay_ms(1000);		
+		 return;
+	}
+  
+  if(TOUCH==1)
+	{    
+	SFG_getimage();	
+	delay_ms(200);	
+	if(querenma==0)
+	{
+	  SFG_genchar(buffer1ID);
+	}
+	SFG_fastsearch(buffer1ID);
+	
+	while(querenma==1)
+	 SFG_fastsearch(buffer1ID);
+	if(querenma==0)
+	{
+
+
+		OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"指纹已存储      ");
+		OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"按继续键        ");
+		OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+		OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");		
+		comeon=1;
+		while(comeon)
+		{
+			Key_value_Demo(Key_Process_Demo);
+		}
+		
+	}
+	else if(querenma==9)
+		{
+			delay_ms(2000);
+
+			OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"再次按手指      ");
+			OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"按继续键        ");
+			OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+			OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");			
+			comeon=1;
+			while(comeon)
+			{
+				Key_value_Demo(Key_Process_Demo);
+			}			
+			SFG_enroll();			
+			while(querenma==2)
+			SFG_enroll();
+			if(querenma==0)
+			{ 
+				
+
+				OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"指纹录入成功    ");
+				OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"编号为:         ");
+				OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+				OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");					
+				OLED_ShowNum_Three_Demo(16*4,16,PageID);
+				user_num[1]++;
+
+				OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"按继续键");
+				comeon=1;
+				while(comeon)
+				{
+					Key_value_Demo(Key_Process_Demo);
+				}
+
+	  	}
+	  	else if(querenma!=0)
+	  	{
+
+				OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"指纹录入失败    ");
+				OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"按继续键        ");
+				OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+				OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");					
+				comeon=1;
+				while(comeon)
+				{
+					Key_value_Demo(Key_Process_Demo);
+				}
+				
+	 		}
+				
+   		}
+		}
+}
+void delet()
+{
+	
+	OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"删除中...       ");
+	OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"                ");
+	OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+	OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");
+	SFG_deletchar(0,MAX_AS);//删除指纹	
+	delay_ms(1000);
+}
+void compare()
+{
+		if(TOUCH==1)
+		{ 
+			SFG_identify();
+			if(querenma==0)
+			{
+				OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"指纹成功        ");
+				OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"                ");
+				OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+				OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");				
+
+			}else
+			{
+				OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"指纹失败        ");
+				OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"                ");
+				OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+				OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");					
+			}
+		}			
+}
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);	
+	  delay_ms(500);
+		
+		as608_init();//指纹初始化
+		OLED_Init3_Demo();
+		KEY_Init_Demo();
+    while(1)
+    {			
+			Key_value_Demo(Key_Process_Demo);
+			delay_ms(100);
+    }
+}
+
+
+**/ 
+#endif
+
+#if CONFIG_GY906 == ENABLED
+#define I2C_SCL GPIO_Pin_3
+#define I2C_SDA GPIO_Pin_4
+#define GPIO_I2C GPIOA
+#define RCC_GPIO RCC_APB2Periph_GPIOA
+
+#define I2C_SCL_H GPIO_SetBits(GPIO_I2C,I2C_SCL)
+#define I2C_SCL_L GPIO_ResetBits(GPIO_I2C,I2C_SCL)
+
+#define I2C_SDA_H GPIO_SetBits(GPIO_I2C,I2C_SDA)
+#define I2C_SDA_L GPIO_ResetBits(GPIO_I2C,I2C_SDA)
+short gy906_Readtemp(void);
+void GY906_I2C_Init1(void);
+
+/*DEMO
+
+short Temp;
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);		
+	  delay_ms(500);
+	  GY906_I2C_Init1();
+    while(1)
+    {
+			Temp=gy906_Readtemp();
+			Temp=(Temp*0.02-273.15)*10; //375
+			OLED_ShowNum_Temp_Demo(0,0,Temp);
+			delay_ms(100);
+    }
+}
+*/
+#endif
+
+#if CONFIG_RELAY == ENABLED
+#define IR PAin(6)
+#define RELAY PAout(7)
+#define BUZZER PBout(0)
+void relay_init(void);
+
+/*demo**
+
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);		
+	  delay_ms(500);
+	  relay_init();
+    while(1)
+    {
+			BUZZER=1;
+			delay_ms(1000);
+    }
+}
+*/
+#endif
+
+#if CONFIG_KEYMAP == ENABLED
+void KEY_Init(void);
+u8 KEY_Scan(void);
+u8 KEY_tranform(u8 keyvalue);
+
+/*demo
+1 2 3 A
+4 5 6 B
+7 8 9 C
+* 0 # D
+
+u8 key_value;
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);		
+	  delay_ms(500);
+	  KEY_Init();
+		OLED_Init3_Demo();
+		OLED_ShowStr_ENCH_Demo(0,0,(unsigned char *)"欢迎使用密码");
+    while(1)
+    {
+			
+			key_value=KEY_tranform(KEY_Scan());
+			if(key_value!=0xff)
+			{
+				OLED_ShowNum_Three_Demo(0,16,key_value);
+			}
+			delay_ms(100);
+    }
+}
+
+*/
+#endif
+
+#if CONFIG_MAX30102 == ENABLED
+//添加myiic.c  max30102.c  algorithm.c这三个文件
+extern int32_t hrAvg;//心率
+extern int32_t spo2Avg;//血氧浓度
+void max30102_init(void);
+void process_max30102(void);
+/**demo
+
+int main(void)
+{
+	max30102_init();
+	
+	while(1)
+	{
+		process_max30102();
+		OLED_ShowNum_Three_Demo(8*3,48,hrAvg);
+		OLED_ShowNum_Three_Demo(8*10,48,spo2Avg);			
+	}
+}
+
+#define MAX_BRIGHTNESS 255
+uint8_t uch_dummy; 
+uint32_t aun_ir_buffer[259]; //infrared LED sensor data
+uint32_t aun_red_buffer[259];  //red LED sensor data
+int32_t n_ir_buffer_length; //data length
+int32_t n_spo2;  //SPO2 value
+int8_t ch_spo2_valid;  //indicator to show if the SPO2 calculation is valid
+int32_t n_heart_rate; //heart rate value
+int8_t  ch_hr_valid;  //indicator to show if the heart rate calculation is valid
+int32_t COUNT = 0;
+
+int32_t hr_buf[250];
+int32_t hrSum;
+int32_t hrAvg;//心率
+int32_t spo2_buf[250];
+int32_t spo2Sum;
+int32_t spo2Avg;//血氧浓度
+int32_t spo2BuffFilled;
+int32_t hrBuffFilled;
+int32_t hrValidCnt = 0;
+int32_t spo2ValidCnt = 0;
+int32_t hrThrowOutSamp = 0;
+int32_t spo2ThrowOutSamp = 0;
+int32_t spo2Timeout = 0;
+int32_t hrTimeout = 0;
+
+void main()
+{
+    uint32_t un_min, un_max, un_prev_data, un_brightness;  //variables to calculate the on-board LED brightness that reflects the heartbeats
+    int32_t i;
+    float f_temp;
+    bsp_InitI2C();//IIC初始化
+    maxim_max30102_reset(); //resets the MAX30102
+    maxim_max30102_read_reg(REG_INTR_STATUS_1, &uch_dummy); //Reads/clears the interrupt status register
+    maxim_max30102_init();  //initialize the MAX30102	
+		
+   un_brightness = 0;
+    un_min = 0x3FFFF;
+    un_max = 0;
+
+    n_ir_buffer_length = 150; //buffer length of 150 stores 3 seconds of samples running at 50sps
+
+    //read the first 150 samples, and determine the signal range
+    for(i = 0; i < n_ir_buffer_length; i++)
+    {
+        //while(KEY0 == 1); //wait until the interrupt pin asserts
+        maxim_max30102_read_fifo((aun_red_buffer + i), (aun_ir_buffer + i)); //read from MAX30102 FIFO
+
+        if(un_min > aun_red_buffer[i])
+            un_min = aun_red_buffer[i]; //update signal min
+        if(un_max < aun_red_buffer[i])
+            un_max = aun_red_buffer[i]; //update signal max
+    }
+    un_prev_data = aun_red_buffer[i];
+    //calculate heart rate and SpO2 after first 150 samples (first 3 seconds of samples)
+    maxim_heart_rate_and_oxygen_saturation(aun_ir_buffer, n_ir_buffer_length, aun_red_buffer, &n_spo2, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid);	
+		
+		
+		while(1)
+		{
+        i = 0;
+        un_min = 0x3FFFF;
+        un_max = 0;
+			
+
+						//dumping the first 50 sets of samples in the memory and shift the last 100 sets of samples to the top
+						for(i = 50; i < 150; i++)
+						{
+								aun_red_buffer[i - 50] = aun_red_buffer[i];
+								aun_ir_buffer[i - 50] = aun_ir_buffer[i];
+
+								//update the signal min and max
+								if(un_min > aun_red_buffer[i])
+										un_min = aun_red_buffer[i];
+								if(un_max < aun_red_buffer[i])
+										un_max = aun_red_buffer[i];
+						}
+
+						//take 50 sets of samples before calculating the heart rate.
+						for(i = 100; i < 150; i++)
+						{
+								un_prev_data = aun_red_buffer[i - 1];
+								//while(KEY0 == 1);
+								maxim_max30102_read_fifo((aun_red_buffer + i), (aun_ir_buffer + i));
+
+								//calculate the brightness of the LED
+								if(aun_red_buffer[i] > un_prev_data)
+								{
+										f_temp = aun_red_buffer[i] - un_prev_data;
+										f_temp /= (un_max - un_min);
+										f_temp *= MAX_BRIGHTNESS;
+										f_temp = un_brightness - f_temp;
+										if(f_temp < 0)
+												un_brightness = 0;
+										else
+												un_brightness = (int)f_temp;
+								}
+								else
+								{
+										f_temp = un_prev_data - aun_red_buffer[i];
+										f_temp /= (un_max - un_min);
+										f_temp *= MAX_BRIGHTNESS;
+										un_brightness += (int)f_temp;
+										if(un_brightness > MAX_BRIGHTNESS)
+												un_brightness = MAX_BRIGHTNESS;
+								}
+						}
+						maxim_heart_rate_and_oxygen_saturation(aun_ir_buffer, n_ir_buffer_length, aun_red_buffer, &n_spo2, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid);
+						
+						
+									
+
+
+						
+						if(COUNT++ > 10)
+						{
+									COUNT = 0;
+									
+									if ((ch_hr_valid == 1) && (n_heart_rate < 150) && (n_heart_rate > 60))
+									{
+											hrTimeout = 0;
+
+											// Throw out up to 1 out of every 5 valid samples if wacky
+											if (hrValidCnt == 4)
+											{
+													hrThrowOutSamp = 1;
+													hrValidCnt = 0;
+													for (i = 12; i < 16; i++)
+													{
+															if (n_heart_rate < hr_buf[i] + 10)
+															{
+																	hrThrowOutSamp = 0;
+																	hrValidCnt   = 4;
+															}
+													}
+											}
+											else
+											{
+													hrValidCnt = hrValidCnt + 1;
+											}
+
+											if (hrThrowOutSamp == 0)
+											{
+
+													// Shift New Sample into buffer
+													for(i = 0; i < 15; i++)
+													{
+															hr_buf[i] = hr_buf[i + 1];
+													}
+													hr_buf[15] = n_heart_rate;
+
+													// Update buffer fill value
+													if (hrBuffFilled < 16)
+													{
+															hrBuffFilled = hrBuffFilled + 1;
+													}
+
+													// Take moving average
+													hrSum = 0;
+													if (hrBuffFilled < 2)
+													{
+															hrAvg = 0;
+													}
+													else if (hrBuffFilled < 4)
+													{
+															for(i = 14; i < 16; i++)
+															{
+																	hrSum = hrSum + hr_buf[i];
+															}
+															hrAvg = hrSum >> 1;
+													}
+													else if (hrBuffFilled < 8)
+													{
+															for(i = 12; i < 16; i++)
+															{
+																	hrSum = hrSum + hr_buf[i];
+															}
+															hrAvg = hrSum >> 2;
+													}
+													else if (hrBuffFilled < 16)
+													{
+															for(i = 8; i < 16; i++)
+															{
+																	hrSum = hrSum + hr_buf[i];
+															}
+															hrAvg = hrSum >> 3;
+													}
+													else
+													{
+															for(i = 0; i < 16; i++)
+															{
+																	hrSum = hrSum + hr_buf[i];
+															}
+															hrAvg = hrSum >> 4;
+													}
+											}
+											hrThrowOutSamp = 0;
+									}
+									else
+									{
+											hrValidCnt = 0;
+											if (hrTimeout == 4)
+											{
+													hrAvg = 0;
+													hrBuffFilled = 0;
+											}
+											else
+											{
+													hrTimeout++;
+											}
+									}
+
+									if ((ch_spo2_valid == 1) && (n_spo2 > 70))
+									{
+											spo2Timeout = 0;
+
+											// Throw out up to 1 out of every 5 valid samples if wacky
+											if (spo2ValidCnt == 4)
+											{
+													spo2ThrowOutSamp = 1;
+													spo2ValidCnt = 0;
+													for (i = 12; i < 16; i++)
+													{
+															if (n_spo2 > spo2_buf[i] - 10)
+															{
+																	spo2ThrowOutSamp = 0;
+																	spo2ValidCnt   = 4;
+															}
+													}
+											}
+											else
+											{
+													spo2ValidCnt = spo2ValidCnt + 1;
+											}
+
+											if (spo2ThrowOutSamp == 0)
+											{
+
+													// Shift New Sample into buffer
+													for(i = 0; i < 15; i++)
+													{
+															spo2_buf[i] = spo2_buf[i + 1];
+													}
+													spo2_buf[15] = n_spo2;
+
+													// Update buffer fill value
+													if (spo2BuffFilled < 16)
+													{
+															spo2BuffFilled = spo2BuffFilled + 1;
+													}
+
+													// Take moving average
+													spo2Sum = 0;
+													if (spo2BuffFilled < 2)
+													{
+															spo2Avg = 0;
+													}
+													else if (spo2BuffFilled < 4)
+													{
+															for(i = 14; i < 16; i++)
+															{
+																	spo2Sum = spo2Sum + spo2_buf[i];
+															}
+															spo2Avg = spo2Sum >> 1;
+													}
+													else if (spo2BuffFilled < 8)
+													{
+															for(i = 12; i < 16; i++)
+															{
+																	spo2Sum = spo2Sum + spo2_buf[i];
+															}
+															spo2Avg = spo2Sum >> 2;
+													}
+													else if (spo2BuffFilled < 16)
+													{
+															for(i = 8; i < 16; i++)
+															{
+																	spo2Sum = spo2Sum + spo2_buf[i];
+															}
+															spo2Avg = spo2Sum >> 3;
+													}
+													else
+													{
+															for(i = 0; i < 16; i++)
+															{
+																	spo2Sum = spo2Sum + spo2_buf[i];
+															}
+															spo2Avg = spo2Sum >> 4;
+													}
+											}
+											spo2ThrowOutSamp = 0;
+									}
+									else
+									{
+											spo2ValidCnt = 0;
+											if (spo2Timeout == 4)
+											{
+													spo2Avg = 0;
+													spo2BuffFilled = 0;
+											}
+											else
+											{
+													spo2Timeout++;
+											}
+									}
+									
+									Lcd1602_Display_Three_bit(0,3,hrAvg);
+									temp = DS18B20_Get_Temp_Demo();
+									Lcd1602_Display_Ds18b02(0,10,temp);
+									//Lcd1602_Display_Three_bit(0,10,spo2Avg);
+								
+									
+						}			
+		}
+}
+
+
+**/
+#endif
+
+
+#if CONFIG_DHT22 == ENABLED
+
+//IO方向设置
+#define DHT22_IO_IN()  {GPIOC->CRH&=0XF0fFFFFF;GPIOC->CRH|=8<<24;}
+#define DHT22_IO_OUT() {GPIOC->CRH&=0XF0fFFFFF;GPIOC->CRH|=3<<24;}
+////IO操作函数											   
+#define	DHT22_DQ_OUT PCout(14) //数据端口	PA0 
+#define	DHT22_DQ_IN  PCin(14)  //数据端口	PA0 
+
+
+u8 DHT22_Init_Demo(void);
+u8 DHT22_Read_Data_Demo(u8 *temp,u8 *humi);
+/*demo
+
+unsigned char Temp,RhValue;
+
+
+
+int main(void)
+{
+	
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);	
+	  delay_ms(500);
+    LCD1602_Init_Demo();
+	  //Lcd1602_Display_String(0,0,(u8*)"hello world");
+		flag=DHT22_Init_Demo();	
+    while(1)
+    {
+			if(DHT22_Read_Data_Demo(&Temp,&RhValue) == 0)
+			{
+				Lcd1602_Display_Three_bit(0,0,Temp);//读出温湿度，只取整数部分
+				Lcd1602_Display_Three_bit(1,0,RhValue);
+			}
+		  
+			delay_ms(2000);
+    }
+}
+
+*/
+#endif
+
+#if CONFIG_IR_REC == ENABLED
+
+//红外 VS1838B  凸出对人 OUT  GND  VCC 
+// CH-(0XA2)  CH(0X62)  CH+(0XE2)
+// <<(0x22)   >>(0x02)  >||(0xc2)
+// -(0xe0)    +(0xa8)     EQ(0x90)
+// 0(0x68)    100+(0x98)  200+(0xb0)
+// 1(0x30)    2(0x18)     3(0x7a)
+// 4(0x10)    5(0x38)     6(0x5a)
+// 7(0x42)    8(0x4a)     9(0x52)
+extern unsigned char ir_num;	
+void Hwjs_Init(void);
+
+/*demo
+
+int mian()
+{
+	Hwjs_Init();//
+	while(1)
+	{
+		if(ir_num==1)	 //设置键
+		{
+
+			ir_num=0;
+
+		}
+	}
+}
+
+*/
+#endif
+#if CONFIG_LCD12864_LIB == ENABLED
+
+/**********************************************
+  PSB引脚接地，
+  RS  PA8
+  RW  PA9
+  EN  PA10
+********************************************/
+
+//定义引脚宏
+#define LCD_CLK_H  GPIO_SetBits  (GPIOA, GPIO_Pin_5 ) 		//enable port
+#define LCD_CLK_L  GPIO_ResetBits  (GPIOA, GPIO_Pin_5 )  	
+
+#define LCD_DATA_H    GPIO_SetBits  (GPIOA, GPIO_Pin_4 ) 		//R/W port
+#define LCD_DATA_L    GPIO_ResetBits  (GPIOA, GPIO_Pin_4 )
+
+#define LCD_CS_H GPIO_SetBits  (GPIOA, GPIO_Pin_3 ) 			//RS port
+#define LCD_CS_L GPIO_ResetBits  (GPIOA, GPIO_Pin_3 )
+
+
+
+void LCD_Init(void);                                                       //初始化
+void LCD_Set_Position(u8 x, u8 y);                                         //发送地址坐标
+void Send_Words(u8 ch);                                                    //发送数据
+//void LCD_GPIO_Init(void);                                                  //引脚设置
+void LCD_SendBity(u8 del);                                                 //发送字节
+void LCD_SendCom(u8 com);                                                  //发送命令
+void LCD_Clear(void) ;                                                     //清除显示
+void LcmClearTXT( void );
+void Delay_10ms(void);                                                          //
+void Delay_100us(void);                                                     //
+void LCD_DispString(char *str);                                           //显示一个字符串，显示位置需提前设定
+void LCD_Wstr(unsigned char y_add , unsigned char x_add , char *str);      //指定地址写字符串
+void LCD_Dispnum(uint32_t num);                                            //显示一个不超过8位的整数，显示位置需提前设置
+void LCD_Setpos_Dispnum(uint16_t row,uint16_t col,uint32_t num);           //在指定位置显示一个不超过8位的整数
+void LCD_Setpos_two_Dispnum(uint16_t row,uint16_t col,char num);
+void LCD_string_Dis(uint16_t row,uint16_t col,unsigned char *strx);
+void LCD_Setpos_shi_Dispnum(uint16_t row,uint16_t col,char year,char yue,char ri);
+/*demo
+
+// BLK  BLA     VOUT  RST                   PSB                 E    RW  RS    VO                  VCC  GND
+// 接GND 接VCC  输出  接VCC(低电平会复位)   接GND(低才是串行)  PA5  PA4  PA3   对比度(不接效果最好) VCC  GND
+int main(void)
+{
+	
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);	
+	  delay_ms(500);
+    LCD_Init();
+    while(1)
+    {
+			LCD_Wstr(1,2,"欢迎使用");
+			LCD_Wstr(2,1,"指纹门禁系统");
+			LCD_Wstr(3,1,"请按手指开锁");
+		  
+			delay_ms(100);
+    }
+}
+		LCD_Wstr(1,0,"                ");
+		LCD_Wstr(2,0,"                ");
+		LCD_Wstr(3,0,"                ");
+		LCD_Wstr(4,0,"                ");
+		LCD_string_Dis(1,0,"你好");
+*/
+#endif
+
+#if CONFIG_MAX6675 == ENABLED
+#define CS1 PAout(0)
+#define CS2 PAout(1)
+#define CS3 PAout(2)
+#define CS4 PAout(3)
+
+#define SCK PAout(4)
+#define SO PAin(5)
+
+void MAX6675_Processing(unsigned char CH,unsigned short *temp);
+void MAX6675_init(void);
+/*demo
+
+unsigned short MAX6675_Temp[4];
+
+int main(void)
+{
+	  unsigned char CH = 0;
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);	
+	  delay_ms(500);
+    MAX6675_init();
+    while(1)
+    {			
+      MAX6675_Processing(++CH%4,MAX6675_Temp);
+			Lcd1602_Display_Three_bit(0,5,MAX6675_Temp[0]);
+			delay_ms(100);
+    }
+}
+
+
+*/
+#endif
+
+
+#if CONFIG_TEA5767 == ENABLED
+#define uchar unsigned char 
+#define uint unsigned int
+/***********************************************************************************/
+#define max_freq 108000     //108Mhz
+#define min_freq 87500        //87.5Mhz
+#define max_pll 0x339b       //108MHz时的pll.
+#define min_pll 0x299d        //87.5MHz时的pll.
+#define Add_Freq    1
+#define Dec_Freq    0
+#define REFERENCE_FREQ    32.768
+#define ATIIcxxDriverAddressW 0xC0
+#define ATIIcxxDriverAddressR 0xC1
+
+#define I2C_SCL GPIO_Pin_3
+#define I2C_SDA GPIO_Pin_4
+#define GPIO_I2C GPIOA
+#define RCC_GPIO RCC_APB2Periph_GPIOA
+
+#define I2C_SCL_H GPIO_SetBits(GPIO_I2C,I2C_SCL)
+#define I2C_SCL_L GPIO_ResetBits(GPIO_I2C,I2C_SCL)
+
+#define I2C_SDA_H GPIO_SetBits(GPIO_I2C,I2C_SDA)
+#define I2C_SDA_L GPIO_ResetBits(GPIO_I2C,I2C_SDA)
+
+void _I2C_Init1(void);
+//读TEA5767状态,并转换成频率
+void Radio_Read(void);
+//由PLL计算频率
+void Get_Frequency(void);
+
+//手动设置频率,mode=1,+0.1MHz; mode="0:-0".1MHz ,不用考虑TEA5767用于搜台的相关位:SM,SUD
+void Search(unsigned char mode);
+//自动搜台,mode=1,频率增加搜台; mode="0:频率减小搜台".
+void Auto_Search(unsigned char mode);
+/*demo
+
+void Key_Process_Demo(unsigned char Key_value)
+{
+
+	if(Key_value == 1)	 //设置键
+	{
+		Search(Add_Freq);
+	}
+
+	if(Key_value == 2)	 //
+	{
+    Search(Dec_Freq);
+	}
+	
+		
+		
+}
+
+int main(void)
+{
+	 // unsigned long temp;
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);	
+	  delay_ms(500);
+    _I2C_Init1();
+	  KEY_Init_Demo();
+	  OLED_Init3_Demo();
+		OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"   FM收音机     ");
+	  OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"频率:           ");
+		OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+		OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");	
+    radio_write_data[0] =0x2A;
+    radio_write_data[1] =0xB6;
+    radio_write_data[2] =0x41;
+    radio_write_data[3] =0x11;
+    radio_write_data[4] =0x40;
+    ATIICxx_PWrite(&radio_write_data[0],5);//初始化TEA5767(89.8Mhz)
+    Frequency_Data = 89800;	
+    while(1)
+    {			
+			//temp= Frequency_Data;
+			Key_value_Demo(Key_Process_Demo);
+      OLED_ShowNum_fm_Demo(8*5,16,Frequency_Data);
+			delay_ms(100);
+    }
+}
+
+
+*/
+
+#endif
+
+
+
+
+#if CONFIG_CALENDAR_CHA == ENABLED
+
+#define uchar unsigned char		 
+#define uint unsigned int
+#define bit unsigned char	
+void Conversion(bit c,uchar year,uchar month,uchar day);
+
+/*demo
+
+unsigned char Time_arry[7]={0,30,10,25,4,22};
+u8 display_mode=0;
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);	
+	  delay_ms(500);
+    DS1302_Init_Demo();
+    while(1)
+    {			
+			Ds1302_Read_Time_Demo(Time_arry);
+			Conversion(0,Time_arry[5],Time_arry[4],Time_arry[3]);
+
+			//LCD_Setpos_two_Dispnum(2,0,Time_arry[2]);
+			//LCD_Setpos_two_Dispnum(2,2,Time_arry[1]);
+			//LCD_Setpos_two_Dispnum(2,4,Time_arry[0]);	
+			if(display_mode==0)
+			{
+				//LCD_Setpos_two_Dispnum(1,0,Time_arry[5]);
+				//LCD_Setpos_two_Dispnum(1,2,Time_arry[4]);
+				//LCD_Setpos_two_Dispnum(1,4,Time_arry[3]);						
+				//LCD_Wstr(4,0,"公历");
+			}else
+			{
+			//	LCD_Setpos_two_Dispnum(1,0,year_moon);
+			//	LCD_Setpos_two_Dispnum(1,2,month_moon);
+			//	LCD_Setpos_two_Dispnum(1,4,day_moon);						
+			//	LCD_Wstr(4,0,"农历");
+			}
+			delay_ms(100);
+    }
+}
+
+
+*/
+#endif
+
+#if CONFIG_BH1750 == ENABLED
+#define uchar unsigned char 
+#define uint  unsigned int
+
+#define SDA   PAout(5)   
+#define SCL   PAout(4)    
+#define sda   GPIO_Pin_5
+#define scl   GPIO_Pin_4
+#define bh1750_PORT GPIOA
+
+#define	  SlaveAddress   0x46   //定义器件在IIC总线中的从地址,根据ALT  ADDRESS地址引脚不同修改
+                              //ALT  ADDRESS引脚接地时地址为0x46，接电源时地址为0xB8
+															
+extern uchar    BUF[8];                         //接收数据缓存区      	
+extern int     dis_data;                       //变量		
+extern int   mcy;              //表示进位标志位
+
+void Init_BH1750(void);
+void conversion(uint temp_data);
+void  Single_Write_BH1750(uchar REG_Address);//单个写入数据
+uchar Single_Read_BH1750(uchar REG_Address);   //单个读取内部寄存器数据
+void  mread(void);         //连续的读取内部寄存器数据
+float read_BH1750(void);
+
+/*demo
+
+
+float light;
+
+light=read_BH1750();  //读取BH1750的光强数据
+OLED_ShowNum_four_Demo(8*10,16,light);
+
+*/
+#endif
+
+#if CONFIG_HLW8032 == ENABLED
+
+void Get_HLW8032(void);
+/*
+
+extern float ActivePower;
+
+USART3_ConfigDemo(4800);
+Get_HLW8032();
+OLED_ShowNum_Five_Demo(8*6,16,ActivePower);
+*/
+#endif
+
+#if CONFIG_RUDDER_PWN == ENABLED
+void PWM_Init(void);
+
+
+/*DEMO
+//会影响DS1302
+PWM_Init();
+
+  TIM_SetCompare1(TIM3,250);
+  TIM_SetCompare2(TIM3,250); 
+  TIM_SetCompare1(TIM4,250);
+  TIM_SetCompare2(TIM4,250); //关
+	
+	
+//通过定时器控制三个角度
+option=5;
+option=10;	
+option=15;
+
+
+unsigned char Menu_Count =0;
+unsigned char option=5;
+unsigned long milli;
+void Key_Process_Demo(unsigned char Key_value)
+{
+
+	if(Key_value == 1)	 //设置键
+	{//TIM_SetCompare1(TIM3,250);
+		Menu_Count ++;
+		option=5;
+		if(Menu_Count >= 2)
+		{
+			//处理返回界面
+			Menu_Count = 0;
+		}
+
+		switch(Menu_Count)
+		{
+			case 1:
+				break;
+			case 2:
+				break;
+		}
+	}
+
+	if(Key_value == 2)	 //
+	{//TIM_SetCompare1(TIM3,500);
+		option=10;
+		switch(Menu_Count)
+		{
+			case 1:
+				break;
+			case 2:
+				break;
+		}
+	}
+	
+	if(Key_value == 3)	 //
+	{option=15;
+		switch(Menu_Count)
+		{
+			case 1:
+				break;
+			case 2:
+				break;
+		}
+	}		
+		
+}
+
+void Tim2_Handle_Process_m()
+{
+
+	if(milli<=option)
+		RELAY=1;
+	else
+		RELAY=0;
+	
+	milli++;
+	if(milli>=200)
+	{
+		milli=0;
+	}	
+}
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);	
+	  delay_ms(500);
+	  TIM2_Int_Init_demo(100, 72,Tim2_Handle_Process_m);//0.1ms
+		//PWM_Init();
+		relay_init();
+		KEY_Init_Demo();
+    while(1)
+    {			
+			Key_value_Demo(Key_Process_Demo);
+			delay_ms(100);
+
+    }
+}
+
+
+
+
+*/
+#endif
+
+
+#if CONFIG_LCD12864_PLUS== ENABLED
+void Init12864(void);
+void showStr(unsigned char row,unsigned char col,unsigned char *s);
+void showXY(unsigned char row,unsigned char col,unsigned char x,unsigned char y,unsigned char *tab);
+void showThreeNum(unsigned char row,unsigned char col,unsigned int s);
+void showDS18B02Num(unsigned char row,unsigned char col,unsigned int s);
+void Ds13b02_DisPlay_12864(unsigned char row,unsigned char col,unsigned char shi,unsigned char fen,unsigned char miao);
+
+#define CONFIG_CH    DISABLED
+
+/*demo
+左45箭头
+{0x00,0x00,0x08,0x38,0xF0,0xF0,0xE0,0xA0,0x20,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
+{0x00,0x00,0x00,0x00,0x01,0x01,0x00,0x01,0x03,0x06,0x0C,0x18,0x30,0x60,0x40,0x00},
+
+中45箭头
+
+{0x00,0x00,0x00,0x00,0x80,0xE0,0x78,0xFE,0xFE,0x78,0xE0,0x80,0x00,0x00,0x00,0x00},
+{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
+右45箭头
+{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x20,0xA0,0xE0,0xF0,0xF0,0x38,0x08,0x00},
+{0x00,0x00,0x40,0x60,0x30,0x18,0x0C,0x06,0x03,0x01,0x00,0x01,0x01,0x00,0x00,0x00},
+
+int main(void)
+{
+    delay_init();	    		//延时函数初始化
+    NVIC_Configuration();	
+	  //不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);	
+	  delay_ms(500);
+		Init12864();
+		showStr(0,0,(u8*)"                ");
+		showStr(2,0,(u8*)"                ");
+		showStr(4,0,(u8*)"                ");
+		showStr(6,0,(u8*)"                ");	
+
+		showStr(0,0,(u8*)" 欢迎使用密码锁 ");
+		showStr(2,0,(u8*)"12  请输入密码   ");
+		showThreeNum(4,64,123);	
+		showThreeNum(6,8*1,123);	
+    while(1)
+    {			
+
+			delay_ms(100);
+    }
+}
+
+*/
+#endif
+
+#if CONFIG_GPS_EX== ENABLED
+
+
+typedef struct{
+	int year;  
+	int month; 
+	int  day;
+	int hour;
+	int minute;
+	int second;
+}DATE_TIME;
+
+typedef  struct{
+	double  latitude;  //经度
+	double  longitude; //纬度
+	int     latitude_Degree;	//度
+	int		latitude_Cent;		//分
+	int   	latitude_Second;    //秒
+	int     longitude_Degree;	//度
+	int		longitude_Cent;		//分
+	int   	longitude_Second;   //秒
+	float 	speed;      //速度
+	float 	direction;  //航向
+	float 	height_ground;    //水平面高度
+	float 	height_sea;       //海拔高度
+	unsigned char 	NS;
+	unsigned char 	EW;
+	DATE_TIME D;
+}GPS_INFO;
+extern unsigned char  gps_flag;      //GPS处理标志
+extern unsigned char  rev_stop ;     //接收停止标志
+extern char  rev_buf[80];        //接收缓存
+int GPS_GGA_Parse(char *line,GPS_INFO *GPS);
+void GPS_Init_Demo(void);
+/*demo 
+
+void showJIN(unsigned char row,unsigned char col,unsigned int s)
+{
+	showNum(row,col,s/10000%10);
+	showNum(row,col+8,s/1000%10);
+	showNum(row,col+16,s/100%10);
+	showStr(row,col+24,".");
+	showNum(row,col+32,s/10%10);
+	showNum(row,col+40,s%10);
+}
+void showwei(unsigned char row,unsigned char col,unsigned int s)
+{
+	showNum(row,col,s/1000%10);
+	showNum(row,col+8,s/100%10);
+	showStr(row,col+16,".");
+	showNum(row,col+24,s/10%10);	
+	showNum(row,col+32,s%10);
+}
+
+GPS_INFO   GPS; 
+int main(void)
+{
+		delay_init();	    		//延时函数初始化
+		NVIC_Configuration();	
+		//不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);
+		GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);	
+		delay_ms(500);
+		GPS_Init_Demo();
+		while(1)
+		{			
+			if(rev_stop)   //如果接收完一行
+			{
+
+					if (GPS_GGA_Parse(rev_buf, &GPS))  //解析GPGGA
+					{
+
+						gps_flag = 0;
+						rev_stop  = 0;
+						//showThreeNum(0,8*7,GPS.direction);
+						//showThreeNum(2,8*7,GPS.speed);
+						if(GPS.speed==15)
+						{
+							//showStr(2,0,"固定解");
+						}else
+						{
+							//showStr(2,0,"未收敛");
+						}
+						//showwei(4,8*5,GPS.longitude);
+						//showJIN(6,8*5,GPS.latitude);
+					}
+					rev_stop  = 0;
+
+			}
+			delay_ms(100);
+		}
+}
+
+*/
+#endif
+#if CONFIG_AS608_EX== ENABLED
+typedef struct  
+{
+	u16 pageID;//指纹ID
+	u16 mathscore;//匹配得分
+}SearchResult;
+
+typedef struct
+{
+	u16 PS_max;//指纹最大容量
+	u8  PS_level;//安全等级
+	u32 PS_addr;
+	u8  PS_size;//通讯数据包大小
+	u8  PS_N;//波特率基数N
+}SysPara;
+#define PS_Sta   PAin(6)//读指纹模块状态引脚
+#define CharBuffer1 0x01
+#define CharBuffer2 0x02
+#define AS608_KEY PBin(14)
+void PS_StaGPIO_Init(void);//初始化PA6读状态引脚
+	
+u8 PS_GetImage(void); //录入图像 
+ 
+u8 PS_GenChar(u8 BufferID);//生成特征 
+
+u8 PS_Match(void);//精确比对两枚指纹特征 
+
+u8 PS_Search(u8 BufferID,u16 StartPage,u16 PageNum,SearchResult *p);//搜索指纹 
+ 
+u8 PS_RegModel(void);//合并特征（生成模板） 
+ 
+u8 PS_StoreChar(u8 BufferID,u16 PageID);//储存模板 
+
+u8 PS_DeletChar(u16 PageID,u16 N);//删除模板 
+
+u8 PS_Empty(void);//清空指纹库 
+
+u8 PS_WriteReg(u8 RegNum,u8 DATA);//写系统寄存器 
+ 
+u8 PS_ReadSysPara(SysPara *p); //读系统基本参数 
+
+u8 PS_SetAddr(u32 addr);  //设置模块地址 
+
+u8 PS_WriteNotepad(u8 NotePageNum,u8 *content);//写记事本 
+
+u8 PS_ReadNotepad(u8 NotePageNum,u8 *note);//读记事 
+
+u8 PS_HighSpeedSearch(u8 BufferID,u16 StartPage,u16 PageNum,SearchResult *p);//高速搜索 
+  
+u8 PS_ValidTempleteNum(u16 *ValidN);//读有效模板个数 
+
+u8 PS_HandShake(u32 *PS_Addr); //与AS608模块握手
+
+const char *EnsureMessage(u8 ensure);//确认码错误信息解析
+
+void Add_FR(void);
+
+void press_FR(void);
+
+void Del_FR(void);
+
+void As608_Init(void);
+
+void keyWait(void);
+
+u8 PS_Enroll(SearchResult *p);
+u8 PS_Identify(SearchResult *p);
+
+/*
+
+#define MAX_AS       60 //最大存储10张IC卡
+
+
+int addfingerEx(void)
+{
+  u8 ensure;
+	SearchResult Sp;	
+	OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"按手指录入      ");
+	OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"                ");
+	OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+	OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");	
+	while(1)
+	{
+		if(PS_Sta==1)
+		{
+			ensure =PS_GetImage();
+			if(ensure !=0)
+			{
+				OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"录入失败 1      ");
+				OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"                ");
+				OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+				OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");
+				delay_ms(2000);
+				return -1;
+			}
+			ensure =PS_GenChar(CharBuffer1);
+			if(ensure !=0)
+			{
+				OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"录入失败 2      ");
+				OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"                ");
+				OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+				OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");
+				delay_ms(2000);
+				return -1;
+			}
+			ensure=PS_HighSpeedSearch(CharBuffer1,0,180,&Sp);
+			if(ensure ==0)
+			{
+				OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"指纹已存储      ");
+				OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"编号:           ");
+				OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"按继续键        ");
+				OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");
+				OLED_ShowNum_Three_Demo(8*5,16,Sp.pageID);
+				keyWait();
+				return -1;				
+			}else if(ensure ==9)
+			{
+				OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"再次按手指      ");
+				OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"按继续键        ");
+				OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+				OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");
+				keyWait();
+				ensure=PS_Enroll(&Sp);
+				if(ensure !=0)
+				{
+					OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"录入失败 3      ");
+					OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"                ");
+					OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+					OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");
+					delay_ms(2000);
+					return -1;
+				}
+				OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"录入成功        ");
+				OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"编号:           ");
+				OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+				OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"按继续键        ");					
+				OLED_ShowNum_Three_Demo(8*5,16,Sp.pageID);
+				if(Sp.pageID<MAX_AS)
+				{
+					
+					OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"成功");
+
+				}				
+				keyWait();
+				return 0;
+			}else
+			{
+				OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"录入失败 4      ");
+				OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"                ");
+				OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+				OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");
+				delay_ms(2000);				
+			}
+		}
+		delay_ms(100);
+	}
+}
+
+void deletEX2(void)
+{
+	u8 ensure;
+
+	OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"删除中...       ");
+	OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"编号:           ");
+	OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+	OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");
+
+
+	ensure=PS_DeletChar(0,MAX_AS);
+	if(ensure==0)
+	{
+		OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"删除成功");
+
+	}else
+	{
+		OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"删除失败");
+	}
+			
+	
+	delay_ms(2000);	
+
+		delay_ms(100);
+	
+}
+int main(void)
+{
+		u8 ensure;
+		SearchResult Sp;
+		delay_init();	    		//延时函数初始化
+		NVIC_Configuration();	
+		//不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);
+		GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);	
+		delay_ms(500);
+		As608_Init();//指纹初始化
+		while(1)
+		{			
+			if(PS_Sta==1)
+			{ 
+
+				ensure=PS_Identify(&Sp);
+				if(ensure==0)
+				{
+					OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"                ");
+					OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"                ");
+					OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+					OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");					
+					if(Sp.pageID<=MAX_AS)
+					{
+						OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"编号:");
+						OLED_ShowNum_Three_Demo(8*5,16,Sp.pageID);
+
+					}
+					else
+						OLED_ShowStr_ENCH_Demo(8*5,16,(unsigned char *)"指纹失败");
+
+				}else
+				{	
+					OLED_ShowStr_ENCH_Demo(0,0 ,(unsigned char *)"                ");
+					OLED_ShowStr_ENCH_Demo(0,16,(unsigned char *)"   指纹失败     ");
+					OLED_ShowStr_ENCH_Demo(0,32,(unsigned char *)"                ");
+					OLED_ShowStr_ENCH_Demo(0,48,(unsigned char *)"                ");						
+
+				}
+				delay_ms(2000);
+				delay_ms(1000);
+		
+			}
+			delay_ms(100);
+		}
+}
+
+*/
+#endif
+
+#if CONFIG_TVOC== ENABLED
+void TvocInit(void);
+extern int voc;
+/*
+int main(void)
+{
+		delay_init();	    		//延时函数初始化
+		NVIC_Configuration();	
+		//不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);
+		GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);	
+		delay_ms(500);
+		TvocInit();
+		while(1)
+		{			
+			OLED_ShowNum_Temp_Demo(8*3,48,voc);	
+			delay_ms(100);
+		}
+}	
+*/
+#endif
+
+
+#if CONFIG_PID== ENABLED
+void Tim2_Handle_Process_func(void);
+void pid_all_init(void);
+void compare_temper(void) ;
+void setcomparevalue(int temp,int set);
+
+/*
+不含小数点
+int main(void)
+{
+		delay_init();	    		//延时函数初始化
+		NVIC_Configuration();	
+		//不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);
+		GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);	
+		delay_ms(500);
+		TIM2_Int_Init_demo(40, 7200,Tim2_Handle_Process_func);
+	  pid_all_init();	
+		while(1)
+		{			
+			setcomparevalue(23,30);
+			compare_temper(); 	//比较温度
+			delay_ms(100);
+		
+
+*/
+#endif
+
+#if CONFIG_MAX30102EX== ENABLED
+void max30102_init(void);
+void blood_Loop(void);
+
+/*
+
+导入MAX30102EX文件里面的所有文件
+int main(void)
+{
+		delay_init();	    		//延时函数初始化
+		NVIC_Configuration();	
+		//不可缺？PA13/14/15 & PB3/4默认配置为JTAG功能，需要把JTAG关掉
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);
+		GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable , ENABLE);	
+		delay_ms(500);
+		max30102_init();
+		while(1)
+		{			
+			blood_Loop();
+			delay_ms(100);
+		}
+}
+
+*/
+#endif
+#endif
+

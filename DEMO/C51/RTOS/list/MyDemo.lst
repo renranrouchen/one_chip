@@ -1,0 +1,3342 @@
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 1   
+
+
+C51 COMPILER V9.52.0.0, COMPILATION OF MODULE MYDEMO
+OBJECT MODULE PLACED IN .\out\MyDemo.obj
+COMPILER INVOKED BY: E:\Keil\C51\BIN\C51.EXE MyDemo.c BROWSE PRINT(.\list\MyDemo.lst) TABS(2) OBJECT(.\out\MyDemo.obj)
+
+line level    source
+
+   1          
+   2          #include "MyConfig.h"
+   3          #include "MyDemo.h"
+   4          #include <intrins.h>
+   5          
+   6          
+   7          #if CONFIG_UTRL == ENABLED
+   8          
+   9          void DelayMs_utrl(unsigned int time)
+  10          {
+  11   1        unsigned int i,j;
+  12   1        for(i=0;i<time;i++)
+  13   1          for(j=0;j<112;j++);
+  14   1      }
+  15          
+  16          #endif
+  17          /*********************LCD1602*********************/
+  18          #if CONFIG_LCD1602 == ENABLED
+  19          
+  20          void Lcd1602_Demo_write_com(unsigned char com);
+  21          void Lcd1602_Demo_write_data(unsigned char dat);
+  22          
+  23          
+  24          /********************************************************************
+  25          * Ãû³Æ : delay_uint()
+  26          * ¹¦ÄÜ : Ð¡ÑÓÊ±¡£
+  27          * ÊäÈë : ÎÞ
+  28          * Êä³ö : ÎÞ
+  29          ***********************************************************************/
+  30          void Lcd1602_delay_uint(unsigned int q)
+  31          {
+  32   1        while(q--);
+  33   1      }
+  34          
+  35          /********************************************************************
+  36          * Ãû³Æ : write_com(uchar com)
+  37          * ¹¦ÄÜ : 1602ÃüÁîº¯Êý
+  38          * ÊäÈë : ÊäÈëµÄÃüÁîÖµ
+  39          * Êä³ö : ÎÞ
+  40          ***********************************************************************/
+  41          void Lcd1602_write_com(unsigned char com)
+  42          {
+  43   1        Lcd1602_e=0;
+  44   1        Lcd1602_rs=0;
+  45   1        Lcd1602_rw=0;
+  46   1        P0=com;
+  47   1        Lcd1602_delay_uint(3);
+  48   1        Lcd1602_e=1;
+  49   1        Lcd1602_delay_uint(25);
+  50   1        Lcd1602_e=0;
+  51   1      }
+  52          
+  53          /********************************************************************
+  54          * Ãû³Æ : write_data(uchar dat)
+  55          * ¹¦ÄÜ : 1602Ð´Êý¾Ýº¯Êý
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 2   
+
+  56          * ÊäÈë : ÐèÒªÐ´Èë1602µÄÊý¾Ý
+  57          * Êä³ö : ÎÞ
+  58          ***********************************************************************/
+  59          void Lcd1602_write_data(unsigned char dat)
+  60          {
+  61   1        Lcd1602_e=0;
+  62   1        Lcd1602_rs=1;
+  63   1        Lcd1602_rw=0;
+  64   1        P0=dat;
+  65   1        Lcd1602_delay_uint(3);
+  66   1        Lcd1602_e=1;
+  67   1        Lcd1602_delay_uint(25);
+  68   1        Lcd1602_e=0;  
+  69   1      }
+  70          
+  71          void Lcd1602_Display_Two_bit(unsigned char hang,unsigned char add,unsigned int date)
+  72          {
+  73   1        if(hang==0)   
+  74   1          Lcd1602_Demo_write_com(0x80+add);
+  75   1        else
+  76   1          Lcd1602_Demo_write_com(0x80+0x40+add);
+  77   1        Lcd1602_Demo_write_data(0x30+date/10%10);
+  78   1        Lcd1602_Demo_write_data(0x30+date%10);  
+  79   1      }
+  80          
+  81          void Lcd1602_Display_Three_bit(unsigned char hang,unsigned char add,unsigned int date)
+  82          {
+  83   1        if(hang==0)   
+  84   1          Lcd1602_Demo_write_com(0x80+add);
+  85   1        else
+  86   1          Lcd1602_Demo_write_com(0x80+0x40+add);
+  87   1        Lcd1602_Demo_write_data(0x30+date/100%10);
+  88   1        Lcd1602_Demo_write_data(0x30+date/10%10);
+  89   1        Lcd1602_Demo_write_data(0x30+date%10);  
+  90   1      }
+  91          
+  92          void Lcd1602_Display_String(unsigned char hang,unsigned char add,unsigned char *p)
+  93          {
+  94   1        if(hang==0)   
+  95   1          Lcd1602_Demo_write_com(0x80+add);
+  96   1        else
+  97   1          Lcd1602_Demo_write_com(0x80+0x40+add);
+  98   1          while(1)
+  99   1          {
+ 100   2            if(*p == '\0')  break;
+ 101   2            Lcd1602_Demo_write_data(*p);
+ 102   2            p++;
+ 103   2          } 
+ 104   1      }
+ 105          
+ 106          
+ 107          /*****************¿ØÖÆ¹â±êº¯Êý********************/
+ 108          void Lcd1602_Display_guanbiao(unsigned char hang,unsigned char add,unsigned char date)
+ 109          {   
+ 110   1        if(hang==0)   
+ 111   1          Lcd1602_Demo_write_com(0x80+add);
+ 112   1        else
+ 113   1          Lcd1602_Demo_write_com(0x80+0x40+add);
+ 114   1        if(date == 1)
+ 115   1          Lcd1602_Demo_write_com(0x0f);     //ÏÔÊ¾¹â±ê²¢ÇÒÉÁË¸  
+ 116   1        else 
+ 117   1          Lcd1602_Demo_write_com(0x0c);   //¹Ø±Õ¹â±ê
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 3   
+
+ 118   1      }
+ 119          
+ 120          void Lcd1602_Display_Init()
+ 121          {
+ 122   1        Lcd1602_Demo_write_com(0x38);
+ 123   1        Lcd1602_Demo_write_com(0x38);
+ 124   1        Lcd1602_Demo_write_com(0x0c);
+ 125   1        Lcd1602_Demo_write_com(0x06);
+ 126   1      }
+ 127          #if CONFIG_DS1302 == ENABLED
+              /*********************************************************/
+              // Òº¾§Êä³öÊý×Ö
+              /*********************************************************/
+              void Ds13b02_DisPlay(unsigned char hang,unsigned char add,unsigned char shi,unsigned char fen,unsigned cha
+             -r miao)
+              {
+                if(hang==0)   
+                  Lcd1602_Demo_write_com(0x80+add);
+                else
+                  Lcd1602_Demo_write_com(0x80+0x40+add); 
+                Lcd1602_Demo_write_data(shi%100/10+0x30);   // Ê®Î»
+                Lcd1602_Demo_write_data(shi%10+0x30);       // ¸öÎ»
+                Lcd1602_Demo_write_data(':');
+                Lcd1602_Demo_write_data(fen%100/10+0x30);   // Ê®Î»
+                Lcd1602_Demo_write_data(fen%10+0x30);       // ¸öÎ»
+                Lcd1602_Demo_write_data(':');
+                Lcd1602_Demo_write_data(miao%100/10+0x30);    // Ê®Î»
+                Lcd1602_Demo_write_data(miao%10+0x30);        // ¸öÎ»
+              
+              }
+              #endif
+ 148          
+ 149          #endif
+ 150          
+ 151          /********************¶ÀÁ¢°´¼ü³ÌÐò*****************/
+ 152          #if CONFIG_KEY == ENABLED
+              
+              
+              void Key_value_Demo(pKey_Process key_Process)  //¶ÀÁ¢°´¼ü³ÌÐò
+              {
+                unsigned char Key_value;
+              #if KEY_COUNT == 1
+                if((Demo_KEY1 == 0))
+                {
+                  if(Demo_KEY1 == 0)
+                  {
+                    Key_value = 1;
+                    while(!Demo_KEY1);
+                  }       
+                } 
+              #endif  
+              #if KEY_COUNT == 2
+                if((Demo_KEY1 == 0) || (Demo_KEY2 == 0))
+                {
+                  if(Demo_KEY1 == 0)
+                  {
+                    Key_value = 1;
+                    while(!Demo_KEY1);
+                  }
+                    
+                  if(Demo_KEY2 == 0)
+                  {
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 4   
+
+                    Key_value = 2;
+                    while(!Demo_KEY2);
+                  }
+                      
+                } 
+                
+              #endif  
+              #if KEY_COUNT == 3
+                if((Demo_KEY1 == 0) || (Demo_KEY2 == 0) || (Demo_KEY3 == 0) )
+                {
+                  if(Demo_KEY1 == 0)
+                  {
+                    Key_value = 1;
+                    while(!Demo_KEY1);
+                  }
+                    
+                  if(Demo_KEY2 == 0)
+                  {
+                    Key_value = 2;
+                    while(!Demo_KEY2);
+                  }
+                    
+                  if(Demo_KEY3 == 0)
+                  {
+                    Key_value = 3;
+                    while(!Demo_KEY3);
+                  }
+                  
+                } 
+              #endif  
+              #if KEY_COUNT == 4
+                if((Demo_KEY1 == 0) || (Demo_KEY2 == 0) || (Demo_KEY3 == 0) || (Demo_KEY4 == 0) )
+                {
+                  if(Demo_KEY1 == 0)
+                  {
+                    Key_value = 1;
+                    while(!Demo_KEY1);
+                  }
+                    
+                  if(Demo_KEY2 == 0)
+                  {
+                    Key_value = 2;
+                    while(!Demo_KEY2);
+                  }
+                    
+                  if(Demo_KEY3 == 0)
+                  {
+                    Key_value = 3;
+                    while(!Demo_KEY3);
+                  }
+                  if(Demo_KEY4 == 0)
+                  {
+                    Key_value = 4;
+                    while(!Demo_KEY4);
+                  }
+                
+                } 
+              #endif  
+              #if KEY_COUNT == 5
+                if((Demo_KEY1 == 0) || (Demo_KEY2 == 0) || (Demo_KEY3 == 0) || (Demo_KEY4 == 0) || (Demo_KEY5 == 0))
+                {
+                  if(Demo_KEY1 == 0)
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 5   
+
+                  {
+                    Key_value = 1;
+                    while(!Demo_KEY1);
+                  }
+                    
+                  if(Demo_KEY2 == 0)
+                  {
+                    Key_value = 2;
+                    while(!Demo_KEY2);
+                  }
+                    
+                  if(Demo_KEY3 == 0)
+                  {
+                    Key_value = 3;
+                    while(!Demo_KEY3);
+                  }
+                  if(Demo_KEY4 == 0)
+                  {
+                    Key_value = 4;
+                    while(!Demo_KEY4);
+                  }
+                  if(Demo_KEY5 == 0)
+                  {
+                    Key_value = 5;
+                    while(!Demo_KEY5);
+                  }
+                
+                } 
+              #endif  
+              #if KEY_COUNT == 6
+                if((Demo_KEY1 == 0) || (Demo_KEY2 == 0) || (Demo_KEY3 == 0) || (Demo_KEY4 == 0) || (Demo_KEY5 == 0) || (D
+             -emo_KEY6 == 0))
+                {
+                  if(Demo_KEY1 == 0)
+                  {
+                    Key_value = 1;
+                    while(!Demo_KEY1);
+                  }
+                    
+                  if(Demo_KEY2 == 0)
+                  {
+                    Key_value = 2;
+                    while(!Demo_KEY2);
+                  }
+                    
+                  if(Demo_KEY3 == 0)
+                  {
+                    Key_value = 3;
+                    while(!Demo_KEY3);
+                  }
+                  if(Demo_KEY4 == 0)
+                  {
+                    Key_value = 4;
+                    while(!Demo_KEY4);
+                  }
+                  if(Demo_KEY5 == 0)
+                  {
+                    Key_value = 5;
+                    while(!Demo_KEY5);
+                  }
+                  if(Demo_KEY6 == 0)
+                  {
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 6   
+
+                    Key_value = 6;
+                    while(!Demo_KEY6);
+                  }   
+                }
+              #endif  
+                else
+                  Key_value = 21;
+                
+                key_Process(Key_value);
+              
+              }
+              
+              
+              
+              #endif
+ 317          
+ 318          
+ 319          /*********************ADC0832********************/
+ 320          #if CONFIG_ADC0832 == ENABLED
+              
+                
+              
+              unsigned char ADC0832_Demo(bit mode,bit channel)    //AD×ª»»£¬·µ»Ø½á¹û
+              {
+                unsigned char i,dat,ndat;
+                
+                ADCS = 0;//À­µÍCS¶Ë
+                _nop_();
+                _nop_();
+                
+                ADDI = 1; //µÚ1¸öÏÂ½µÑØÎª¸ßµçÆ½
+                ADCLK = 1;//À­¸ßCLK¶Ë
+                _nop_();
+                _nop_();
+                ADCLK = 0;//À­µÍCLK¶Ë,ÐÎ³ÉÏÂ½µÑØ1
+                _nop_();
+                _nop_();
+                
+                ADDI = mode;  //µÍµçÆ½Îª²î·ÖÄ£Ê½£¬¸ßµçÆ½Îªµ¥Í¨µÀÄ£Ê½¡£  
+                ADCLK = 1;//À­¸ßCLK¶Ë
+                _nop_();
+                _nop_();
+                ADCLK = 0;//À­µÍCLK¶Ë,ÐÎ³ÉÏÂ½µÑØ2
+                _nop_();
+                _nop_();
+                
+                ADDI = channel; //µÍµçÆ½ÎªCH0£¬¸ßµçÆ½ÎªCH1  
+                ADCLK = 1;//À­¸ßCLK¶Ë
+                _nop_();
+                _nop_();
+                ADCLK = 0;//À­µÍCLK¶Ë,ÐÎ³ÉÏÂ½µÑØ3
+                
+                ADDI = 1;//¿ØÖÆÃüÁî½áÊø(¾­ÊÔÑé±ØÐè)
+                dat = 0;
+                //ÏÂÃæ¿ªÊ¼¶ÁÈ¡×ª»»ºóµÄÊý¾Ý£¬´Ó×î¸ßÎ»¿ªÊ¼ÒÀ´ÎÊä³ö£¨D7~D0£©
+                for(i = 0;i < 8;i++)
+                {
+                  dat <<= 1;
+                  ADCLK=1;//À­¸ßÊ±ÖÓ¶Ë
+                  _nop_();
+                  _nop_();
+                  ADCLK=0;//À­µÍÊ±ÖÓ¶ËÐÎ³ÉÒ»´ÎÊ±ÖÓÂö³å
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 7   
+
+                  _nop_();
+                  _nop_();
+                  dat |= ADDO;
+                }
+                ndat = 0;      //¼ÇÂ¼D0
+                if(ADDO == 1)
+                ndat |= 0x80;
+                //ÏÂÃæ¿ªÊ¼¼ÌÐø¶ÁÈ¡·´ÐòµÄÊý¾Ý£¨´ÓD1µ½D7£© 
+                for(i = 0;i < 7;i++)
+                {
+                  ndat >>= 1;
+                  ADCLK = 1;//À­¸ßÊ±ÖÓ¶Ë
+                  _nop_();
+                  _nop_();
+                  ADCLK=0;//À­µÍÊ±ÖÓ¶ËÐÎ³ÉÒ»´ÎÊ±ÖÓÂö³å
+                  _nop_();
+                  _nop_();
+                  if(ADDO==1)
+                  ndat |= 0x80;
+                }   
+                ADCS=1;//À­¸ßCS¶Ë,½áÊø×ª»»
+                ADCLK=0;//À­µÍCLK¶Ë
+                ADDI=1;//À­¸ßÊý¾Ý¶Ë,»Øµ½³õÊ¼×´Ì¬
+                if(dat==ndat)
+                return(dat);
+                else
+                return 0;   
+              }
+              
+              #endif
+ 394          
+ 395          /*********************DS1302********************/
+ 396          #if CONFIG_DS1302 == ENABLED
+              
+              /******************
+                ds1302 ÄÚ²¿RAM   RAM0  1100 000R/W   1¶Á 0Ð´
+                         RAM1  1100 001R/W  
+                               ....... 
+                         RAM30 1111 110R/W   
+              ********************/
+              
+              unsigned char code Ds1302_write_add[]={0x80,0x82,0x84,0x86,0x88,0x8c,0x8a};   //Ð´µØÖ·
+              unsigned char code Ds1302_read_add[] ={0x81,0x83,0x85,0x87,0x89,0x8d,0x8b};   //¶ÁµØÖ·
+              unsigned char code Ds1302_init_ds[]  ={0x58,0x29,0x07,0x05,0x10,0x14,0x1}; 
+              
+              void DelayMs_Ds1302(unsigned int time)
+              {
+                unsigned int i,j;
+                for(i=0;i<time;i++)
+                  for(j=0;j<112;j++);
+              }
+              
+              /*************Ð´Ò»¸öÊý¾Ýµ½¶ÔÓ¦µÄµØÖ·Àï***************/
+              void Ds1302_Write_Demo(unsigned char add,unsigned char dat)
+              {
+                unsigned char i;
+                rst = 1;       //°Ñ¸´Î»ÏßÄÃ¸ß
+                for(i=0;i<8;i++)
+                {            //µÍÎ»ÔÚÇ°
+              
+                  io = add & 0x01;      
+                  add >>= 1;     //°ÑµØÖ·ÓÒÒÆÒ»Î»
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 8   
+
+                  clk = 1;     //Ê±ÖÓÏßÄÃ¸ß  
+                  clk = 0;     //Ê±ÖÓÏßÄÃµÍ¿ªÊ¼Ð´Êý¾Ý
+                }                  
+                for(i=0;i<8;i++)
+                {
+              
+                  io = dat & 0x01;
+                  dat >>= 1;     //°ÑÊý¾ÝÓÒÒÆÒ»Î» 
+                  clk = 1;     //Ê±ÖÓÏßÄÃ¸ß
+                  clk = 0;     //Ê±ÖÓÏßÄÃµÍ¿ªÊ¼Ð´Êý¾Ý
+                }
+                rst = 0;       //¸´Î»ÏßºÏµÍ
+              }
+              
+              
+              /*************´Ó¶ÔÓ¦µÄµØÖ·¶ÁÒ»¸öÊý¾Ý³öÀ´***************/
+              unsigned char Ds1302_Read_Demo(unsigned char add)
+              {
+                unsigned char value,i;
+                rst = 1;       //°Ñ¸´Î»ÏßÄÃ¸ß
+                for(i=0;i<8;i++)
+                {            //µÍÎ»ÔÚÇ°
+                  clk = 0;     //Ê±ÖÓÏßÄÃµÍ¿ªÊ¼Ð´Êý¾Ý
+                  io = add & 0x01;      
+                  add >>= 1;     //°ÑµØÖ·ÓÒÒÆÒ»Î»
+                  clk = 1;     //Ê±ÖÓÏßÄÃ¸ß
+                }   
+                for(i=0;i<8;i++)
+                {
+                  clk = 1;     //Ê±ÖÓÏßÄÃ¸ß
+                  clk = 0;     //Ê±ÖÓÏßÄÃµÍ¿ªÊ¼¶ÁÊý¾Ý
+                  value >>= 1;
+                  if(io == 1)
+                    value |= 0x80;
+                }
+                rst = 0;       //¸´Î»ÏßºÏµÍ
+                clk = 0;
+                io = 0;
+                return value;    //·µ»Ø¶Á³öÀ´µÄÊý¾Ý
+              }
+              
+              unsigned char BCD_Decimal(unsigned char bcd)//BCDÂë×ªÊ®½øÖÆº¯Êý£¬ÊäÈëBCD£¬·µ»ØÊ®½øÖÆ
+              {
+                 unsigned char Decimal;
+                 Decimal=bcd>>4;
+                 return(Decimal=Decimal*10+(bcd&=0x0F));
+              }
+              
+              /*************°ÑÒªµÄÊ±¼ä ÄêÔÂÈÕ ¶¼¶Á³öÀ´***************/
+              //arry[7]
+              void Ds1302_Read_Time(unsigned char *arry)
+              {
+                *arry      = BCD_Decimal(Ds1302_Read_Demo(Ds1302_read_add[0])); //¶ÁÃë
+                *(arry+1)  = BCD_Decimal(Ds1302_Read_Demo(Ds1302_read_add[1])); //¶Á·Ö
+                *(arry+2)  = BCD_Decimal(Ds1302_Read_Demo(Ds1302_read_add[2])); //¶ÁÊ±
+                *(arry+3)  = BCD_Decimal(Ds1302_Read_Demo(Ds1302_read_add[3])); //¶ÁÈÕ
+                *(arry+4)  = BCD_Decimal(Ds1302_Read_Demo(Ds1302_read_add[4])); //¶ÁÔÂ
+                *(arry+5)  = BCD_Decimal(Ds1302_Read_Demo(Ds1302_read_add[5])); //¶ÁÄê
+                *(arry+6)  = BCD_Decimal(Ds1302_Read_Demo(Ds1302_read_add[6])); //¶ÁÐÇÆÚ
+              }
+              
+              void Ds1302_Save(unsigned char  po, unsigned char  dat)
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 9   
+
+              {
+                unsigned char  temp;
+                temp=(dat)/10*16+(dat)%10;//Ê®½øÖÆ×ª»»³ÉDS1302ÒªÇóµÄDCBÂë
+                Ds1302_Write_Demo(0x8e,0x00);//ÔÊÐíÐ´£¬½ûÖ¹Ð´±£»¤ 
+                Ds1302_Write_Demo(po,temp);//ÏòDS1302ÄÚÐ´·Ö¼Ä´æÆ÷82HÐ´Èëµ÷ÕûºóµÄ·ÖÊý¾ÝBCDÂë
+                Ds1302_Write_Demo(0x8e,0x80);//´ò¿ªÐ´±£»¤ 
+              }
+              
+              /*************°ÑÒªÐ´µÄÊ±¼ä ÄêÔÂÈÕ ¶¼Ð´Èëds1302Àï***************/
+              void Ds1302_Write_Time(unsigned char *arry)
+              {
+                Ds1302_Write_Demo(0x8e,0x00);     //´ò¿ªÐ´±£»¤
+              
+                Ds1302_Write_Demo(Ds1302_write_add[0],0x80);  
+              
+                Ds1302_Write_Demo(Ds1302_write_add[0],arry[0]); //Ð´Ãë
+                Ds1302_Write_Demo(Ds1302_write_add[1],arry[1]);   //Ð´·Ö
+                Ds1302_Write_Demo(Ds1302_write_add[2],arry[2]);   //Ð´Ê±
+                Ds1302_Write_Demo(Ds1302_write_add[3],arry[3]);   //Ð´ÈÕ
+                Ds1302_Write_Demo(Ds1302_write_add[4],arry[4]);   //Ð´ÔÂ
+                Ds1302_Write_Demo(Ds1302_write_add[5],arry[5]); //Ð´ÐÇÆÚ
+                Ds1302_Write_Demo(Ds1302_write_add[6],arry[6]); //Ð´Äê
+                Ds1302_Write_Demo(0x8e,0x80);     //¹Ø±ÕÐ´±£»¤
+              }
+              
+              /*************°ÑÊý¾Ý±£´æµ½ds1302 RAMÖÐ**0-31*************/
+              void Ds1302_Write_ram(unsigned char add,unsigned char dat)
+              {
+                add <<= 1;     //µØÖ·ÊÇ´ÓµÚ¶þÎ»¿ªÊ¼µÄ
+                add &= 0xfe;   //°Ñ×îµÍÎ»ÇåÁã  ÊÇÐ´µÄÃüÁî
+                add |= 0xc0;   //µØÖ·×î¸ßÁ½Î»Îª 1  
+                Ds1302_Write_Demo(0x8e,0x00);
+                Ds1302_Write_Demo(add,dat); 
+                Ds1302_Write_Demo(0x8e,0x80);
+              }
+              
+              
+              /*************°ÑÊý¾Ý´Óds1302 RAM¶Á³öÀ´**0-31*************/
+              unsigned char Ds1302_Read_ds1302ram(unsigned char add)
+              {
+                add <<= 1;     //µØÖ·ÊÇ´ÓµÚ¶þÎ»¿ªÊ¼µÄ
+                add |= 0x01;   //°Ñ×î¸ßÎ»ÖÃ1  ÊÇ¶ÁÃüÁî
+                add |= 0xc0;   //µØÖ·×î¸ßÁ½Î»Îª 1  
+                return(Ds1302_Read_Demo(add));  
+              }
+              
+              /**********************ÉèÖÃds1302Ê±¼äº¯Êý**********************/
+              void Ds1302_Set_time(unsigned char num,unsigned char *shi,unsigned char dat)   //µ÷Ê±
+              {
+                  if(num == 1)
+                  {
+                    *shi+=0x01;
+                  if((*shi & 0x0f) >= 0x0a)
+                    *shi = (*shi & 0xf0) + 0x10;
+                  if(*shi >= dat)
+                    *shi = 0;
+                  }
+                  else
+                  {
+                  if(*shi == 0x00)
+                    *shi = dat;
+                  if((*shi & 0x0f) == 0x00)
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 10  
+
+                    *shi = (*shi | 0x0a) - 0x10;
+                  *shi -=0x01 ; 
+                  }  
+              }
+              
+              /*************³õÊ¼»¯ds1302Ê±¼ä***************/
+              void Ds1302_Init()
+              {
+                unsigned char i;
+                rst = 0;  //µÚÒ»´Î¶ÁÐ´Êý¾ÝÊ±Òª°ÑIOÆ·ÄÃµÍ
+                clk = 0;
+                io = 0;
+                i = Ds1302_Read_ds1302ram(30);   
+                if(i != 3)
+                { 
+                  i = 3;
+                  Ds1302_Write_ram(30,i);      //4050   4100     3080
+              
+                  Ds1302_Write_Demo(0x8e,0x00);             //´ò¿ªÐ´±£»¤
+                  for(i=0;i<7;i++)
+                    Ds1302_Write_Demo(Ds1302_write_add[i],Ds1302_init_ds[i]); //°Ñ×î¸ßÎ»Öµ0 ÔÊÐíds1302¹¤×÷
+                  Ds1302_Write_Demo(0x8e,0x80); //¹ØÐ´±£»¤
+                }
+              
+                //read_time();      //¶ÁÊ±¼ä
+                //if(miao >= 0x60)
+                {
+                  Ds1302_Write_Demo(0x8e,0x00);             //´ò¿ªÐ´±£»¤
+                  Ds1302_Write_Demo(Ds1302_write_add[0],0x01);  //°Ñ×î¸ßÎ»Öµ0 ÔÊÐíds1302¹¤×÷
+                  Ds1302_Write_Demo(0x8e,0x80); //¹ØÐ´±£»¤
+                  
+                }
+              
+              }
+              
+              /*demo
+              uchar arry[7];
+              Ds1302_Read_Time(arry);
+              */
+              #endif
+ 590          
+ 591          /*********************DS18b02********************/
+ 592          #if CONFIG_DS18b02 == ENABLED
+              /***********************18b20³õÊ¼»¯º¯Êý*****************************/
+              
+              /********************************************************************
+              * Ãû³Æ : delay_uint()
+              * ¹¦ÄÜ : Ð¡ÑÓÊ±¡£
+              * ÊäÈë : ÎÞ
+              * Êä³ö : ÎÞ
+              ***********************************************************************/
+              
+              
+              void delay_18B20(unsigned int q)
+              {
+                while(q--);
+              }
+              
+              void Ds18b02_Init()
+              {
+                bit q;
+                dq = 1;       //°Ñ×ÜÏßÄÃ¸ß
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 11  
+
+                delay_18B20(1);     //15us
+                dq = 0;       //¸ø¸´Î»Âö³å
+                delay_18B20(80);    //750us
+                dq = 1;       //°Ñ×ÜÏßÄÃ¸ß µÈ´ý
+                delay_18B20(10);    //110us
+                q = dq;       //¶ÁÈ¡18b20³õÊ¼»¯ÐÅºÅ
+                delay_18B20(20);    //200us
+                dq = 1;       //°Ñ×ÜÏßÄÃ¸ß ÊÍ·Å×ÜÏß
+              }
+              
+              /*************Ð´18b20ÄÚµÄÊý¾Ý***************/
+              void DS18b20_Write(unsigned char dat)
+              {
+                unsigned char i;
+                for(i=0;i<8;i++)
+                {          //Ð´Êý¾ÝÊÇµÍÎ»¿ªÊ¼
+                  dq = 0;      //°Ñ×ÜÏßÄÃµÍÐ´Ê±¼äÏ¶¿ªÊ¼ 
+                  dq = dat & 0x01; //Ïò18b20×ÜÏßÐ´Êý¾ÝÁË
+                  delay_18B20(5);  // 60us
+                  dq = 1;      //ÊÍ·Å×ÜÏß
+                  dat >>= 1;
+                } 
+              }
+              
+              /*************¶ÁÈ¡18b20ÄÚµÄÊý¾Ý***************/
+              unsigned char Ds18b20_Read()
+              {
+                unsigned char i,value;
+                for(i=0;i<8;i++)
+                {
+                  dq = 0;      //°Ñ×ÜÏßÄÃµÍ¶ÁÊ±¼äÏ¶¿ªÊ¼ 
+                  value >>= 1;   //¶ÁÊý¾ÝÊÇµÍÎ»¿ªÊ¼
+                  dq = 1;      //ÊÍ·Å×ÜÏß
+                  if(dq == 1)    //¿ªÊ¼¶ÁÐ´Êý¾Ý 
+                    value |= 0x80;
+                  delay_18B20(5);  //60us ¶ÁÒ»¸öÊ±¼äÏ¶×îÉÙÒª±£³Ö60usµÄÊ±¼ä
+                }
+                return value;    //·µ»ØÊý¾Ý
+              }
+              
+              /*************¶ÁÈ¡ÎÂ¶ÈµÄÖµ ¶Á³öÀ´µÄÊÇÐ¡Êý***************/
+              unsigned int Ds18b20_Read_temp()
+              {
+                unsigned int value;
+                unsigned char low;         //ÔÚ¶ÁÈ¡ÎÂ¶ÈµÄÊ±ºòÈç¹ûÖÐ¶ÏµÄÌ«Æµ·±ÁË£¬¾ÍÓ¦¸Ã°ÑÖÐ¶Ï¸ø¹ØÁË£¬·ñÔò»áÓ°Ïìµ½18b20µÄÊ±Ðò
+                Ds18b02_Init();      //³õÊ¼»¯18b20
+                DS18b20_Write(0xcc);     //Ìø¹ý64Î»ROM
+                DS18b20_Write(0x44);     //Æô¶¯Ò»´ÎÎÂ¶È×ª»»ÃüÁî
+              
+                Ds18b02_Init();      //³õÊ¼»¯18b20
+                
+                DS18b20_Write(0xcc);     //Ìø¹ý64Î»ROM
+                DS18b20_Write(0xbe);     //·¢³ö¶ÁÈ¡ÔÝ´æÆ÷ÃüÁî
+                
+                low = Ds18b20_Read();    //¶ÁÎÂ¶ÈµÍ×Ö½Ú
+                value = Ds18b20_Read();  //¶ÁÎÂ¶È¸ß×Ö½Ú
+                value <<= 8;       //°ÑÎÂ¶ÈµÄ¸ßÎ»×óÒÆ8Î»
+                value |= low;      //°Ñ¶Á³öµÄÎÂ¶ÈµÍÎ»·Åµ½valueµÄµÍ°ËÎ»ÖÐ
+                value *= 0.0625;         //×ª»»µ½ÎÂ¶ÈÖµ 
+                return value;      //·µ»Ø¶Á³öµÄÎÂ¶È 
+              }
+              
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 12  
+
+              #endif
+ 675          
+ 676          
+ 677          /*********************EEPROM********************/
+ 678          #if CONFIG_EEPROM == ENABLED
+              
+              /********STC89C51ÉÈÇø·Ö²¼*******
+              µÚÒ»ÉÈÇø£º1000H--11FF
+              µÚ¶þÉÈÇø£º1200H--13FF
+              µÚÈýÉÈÇø£º1400H--15FF
+              µÚËÄÉÈÇø£º1600H--17FF
+              µÚÎåÉÈÇø£º1800H--19FF
+              µÚÁùÉÈÇø£º1A00H--1BFF
+              µÚÆßÉÈÇø£º1C00H--1DFF
+              µÚ°ËÉÈÇø£º1E00H--1FFF
+              *****************/
+              
+              /********STC89C52ÉÈÇø·Ö²¼*******
+              µÚÒ»ÉÈÇø£º2000H--21FF
+              µÚ¶þÉÈÇø£º2200H--23FF
+              µÚÈýÉÈÇø£º2400H--25FF
+              µÚËÄÉÈÇø£º2600H--27FF
+              µÚÎåÉÈÇø£º2800H--29FF
+              µÚÁùÉÈÇø£º2A00H--2BFF
+              µÚÆßÉÈÇø£º2C00H--2DFF
+              µÚ°ËÉÈÇø£º2E00H--2FFF
+              *****************/
+              
+              
+              #define RdCommand 0x01 //¶¨ÒåISPµÄ²Ù×÷ÃüÁî
+              #define PrgCommand 0x02
+              #define EraseCommand 0x03 
+              #define Error 1
+              #define Ok 0
+              #define WaitTime 0x01 //¶¨ÒåCPUµÄµÈ´ýÊ±¼ä
+              sfr ISP_DATA=0xe2;  //¼Ä´æÆ÷ÉêÃ÷
+              sfr ISP_ADDRH=0xe3;
+              sfr ISP_ADDRL=0xe4;
+              sfr ISP_CMD=0xe5;
+              sfr ISP_TRIG=0xe6;
+              sfr ISP_CONTR=0xe7;
+              
+              
+                
+              
+              /* ================ ´ò¿ª ISP,IAP ¹¦ÄÜ ================= */
+              void ISP_IAP_enable_Demo(void)
+              {
+                 EA = 0;       /* ¹ØÖÐ¶Ï   */
+                 ISP_CONTR = ISP_CONTR & 0x18;       /* 0001,1000 */
+                 ISP_CONTR = ISP_CONTR | WaitTime; /* Ð´ÈëÓ²¼þÑÓÊ± */
+                 ISP_CONTR = ISP_CONTR | 0x80;       /* ISPEN=1  */
+              }
+              /* =============== ¹Ø±Õ ISP,IAP ¹¦ÄÜ ================== */
+              void ISP_IAP_disable_Demo(void)
+              {
+                 ISP_CONTR = ISP_CONTR & 0x7f; /* ISPEN = 0 */
+                 ISP_TRIG = 0x00;
+                 EA   =   1;   /* ¿ªÖÐ¶Ï */
+              }
+              /* ================ ¹«ÓÃµÄ´¥·¢´úÂë ==================== */
+              void ISPgoon_Demo(void)
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 13  
+
+              {
+                 ISP_IAP_enable_Demo();   /* ´ò¿ª ISP,IAP ¹¦ÄÜ */
+                 ISP_TRIG = 0x46;  /* ´¥·¢ISP_IAPÃüÁî×Ö½Ú1 */
+                 ISP_TRIG = 0xb9;  /* ´¥·¢ISP_IAPÃüÁî×Ö½Ú2 */
+                 _nop_();
+              }
+              /* ==================== ×Ö½Ú¶Á ======================== */
+              unsigned char byte_read_Demo(unsigned int byte_addr)
+              {
+                EA = 0;
+                 ISP_ADDRH = (unsigned char)(byte_addr >> 8);/* µØÖ·¸³Öµ */
+                 ISP_ADDRL = (unsigned char)(byte_addr & 0x00ff);
+                 ISP_CMD   = ISP_CMD & 0xf8;   /* Çå³ýµÍ3Î»  */
+                 ISP_CMD   = ISP_CMD | RdCommand; /* Ð´Èë¶ÁÃüÁî */
+                 ISPgoon_Demo();       /* ´¥·¢Ö´ÐÐ  */
+                 ISP_IAP_disable_Demo();    /* ¹Ø±ÕISP,IAP¹¦ÄÜ */
+                 EA  = 1;
+                 return (ISP_DATA);    /* ·µ»Ø¶Áµ½µÄÊý¾Ý */
+              }
+              /* ================== ÉÈÇø²Á³ý ======================== */
+              void SectorErase_Demo(unsigned int sector_addr)
+              {
+                 unsigned int iSectorAddr;
+                 iSectorAddr = (sector_addr & 0xfe00); /* È¡ÉÈÇøµØÖ· */
+                 ISP_ADDRH = (unsigned char)(iSectorAddr >> 8);
+                 ISP_ADDRL = 0x00;
+                 ISP_CMD = ISP_CMD & 0xf8;   /* Çå¿ÕµÍ3Î»  */
+                 ISP_CMD = ISP_CMD | EraseCommand; /* ²Á³ýÃüÁî3  */
+                 ISPgoon_Demo();       /* ´¥·¢Ö´ÐÐ  */
+                 ISP_IAP_disable_Demo();    /* ¹Ø±ÕISP,IAP¹¦ÄÜ */
+              }
+              /* ==================== ×Ö½ÚÐ´ ======================== */
+              void byte_write_Demo(unsigned int byte_addr, unsigned char original_data)
+              {
+                 EA  = 0;
+              //   SectorErase(byte_addr);
+                 ISP_ADDRH = (unsigned char)(byte_addr >> 8);  /* È¡µØÖ·  */
+                 ISP_ADDRL = (unsigned char)(byte_addr & 0x00ff);
+                 ISP_CMD  = ISP_CMD & 0xf8;    /* ÇåµÍ3Î» */
+                 ISP_CMD  = ISP_CMD | PrgCommand;  /* Ð´ÃüÁî2 */
+                 ISP_DATA = original_data;   /* Ð´ÈëÊý¾Ý×¼±¸ */
+                 ISPgoon_Demo();       /* ´¥·¢Ö´ÐÐ  */
+                 ISP_IAP_disable_Demo();     /* ¹Ø±ÕIAP¹¦ÄÜ */
+                 EA =1;
+              }
+              #endif
+ 782          
+ 783          
+ 784          /*********************24C02********************/
+ 785          #if CONFIG_24C02 == ENABLED
+              
+              /*********************************
+                    BASE  DRIVE
+              **********************************/
+              void DELAY_24C02_Demo(unsigned int t)
+              {
+                while(t!=0)
+                t--;
+              }
+              
+              /******************************
+                    IIC  DRIVE
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 14  
+
+              ******************************/
+              void IICStart_24C02_Demo(void)
+              {
+                   SCL=0;  
+                 DELAY_24C02_Demo(1);
+                   SDA=1; SCL=1; DELAY_24C02_Demo(1);
+                   SDA=0; DELAY_24C02_Demo(1);
+                   SCL=0; 
+              }
+              
+              void IICStop_24C02_Demo(void)
+              {
+                 SDA=0;SCL=1; DELAY_24C02_Demo(1);
+                   SDA=1; DELAY_24C02_Demo(1);
+                   SCL=0;   
+              }
+              void SEND0_24C02_Demo(void)
+              {
+                SDA=0;
+                SCL=1;
+                DELAY_24C02_Demo(1);
+                SCL=0;
+              }
+              
+              void SEND1_24C02_Demo(void)
+              {
+                SDA=1;
+                DELAY_24C02_Demo(1);
+                SCL=1;
+                DELAY_24C02_Demo(1);
+                SCL=0;
+              }
+              
+              bit Check_Ack_24C02_Demo(void)
+              {
+                 unsigned char errtime=250;
+                 DELAY_24C02_Demo(1);
+                 SCL=1; 
+                 DELAY_24C02_Demo(1);
+                 CY=SDA;
+                 while(CY)
+                 {
+                  errtime--; 
+                  CY=SDA;
+                  if (!errtime)
+                   {
+                   IICStop_24C02_Demo();
+                  
+                   return 1;
+                   }
+              }
+               DELAY_24C02_Demo(1);
+               SCL=0; 
+               return 0;
+              }
+              
+              
+              void Write_byte_24C02_Demo(unsigned char dat) 
+              {
+                  unsigned char i;
+                for(i=0;i<8;i++)
+                { 
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 15  
+
+                  if((dat<<i)&0x80)
+                  SEND1_24C02_Demo();
+                  else
+                  SEND0_24C02_Demo();
+                }
+              }
+              
+              
+              unsigned char Read_byte_24C02_Demo(void)
+              {
+                unsigned char i,temp=0;     
+                for(i=0;i<8;i++)
+                {
+                      SDA=1;
+                    SCL=1;
+                    DELAY_24C02_Demo(1);  
+                  if(SDA==1)
+                  {
+                    temp=temp<<1;
+                    temp=temp|0x01;
+                  }
+                  else
+                    temp=temp<<1;
+                   SCL=0; 
+                  }
+                  return temp;
+              }
+              
+              /************************************
+                    EEPROM  DRIVE
+                  Addr:from 0x00-->
+              *************************************/
+              unsigned char rdeeprom_24C02_Demo(unsigned char addr)
+              { 
+                      unsigned char temp=0;
+                  bit flag=0;
+                  IICStart_24C02_Demo();
+                  Write_byte_24C02_Demo(0xa0);
+                      Check_Ack_24C02_Demo();
+                  Write_byte_24C02_Demo(addr);
+                  Check_Ack_24C02_Demo();
+                  IICStart_24C02_Demo();
+                  Write_byte_24C02_Demo(0xa1);
+                  Check_Ack_24C02_Demo();
+                  temp=Read_byte_24C02_Demo();
+                  SEND1_24C02_Demo();
+                  IICStop_24C02_Demo();
+                    return temp;   
+              }  
+                  
+                 
+              void wrteeprom_24C02_Demo(unsigned char addr,unsigned char dat)
+              {
+                  IICStart_24C02_Demo();
+                  Write_byte_24C02_Demo(0xa0);
+                  Check_Ack_24C02_Demo();
+                  Write_byte_24C02_Demo(addr);
+                  Check_Ack_24C02_Demo();
+                  Write_byte_24C02_Demo(dat);
+                  Check_Ack_24C02_Demo();
+                  IICStop_24C02_Demo();
+              } 
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 16  
+
+              #endif
+ 923          
+ 924          /*********************Timer2********************/
+ 925          #if CONFIG_Timer2 == ENABLED
+              static Timer2_Process  Interrp_Process;
+              
+              unsigned char TimeCtr;
+              
+              void Timer2_init_Demo(Timer2_Process T_Process)
+              {
+                RCAP2H = (0XFFFF - 50000)/256;
+                RCAP2L = (0XFFFF - 50000)%256;
+                T2CON =0;
+                //T2MOD = 0;
+                IE |=0xA0;
+                TR2 = 1;
+                Interrp_Process = T_Process;
+              }
+              
+              void timer2() interrupt 5
+              {
+                TF2 = 0;
+                TimeCtr++;
+                if(TimeCtr >= Time_count)//1Ãë
+                {
+                  TimeCtr =0;
+                  Interrp_Process();
+                  //Buzzer_P = ~Buzzer_P;
+                }
+                  
+              }
+              
+              #endif
+ 955          
+ 956          /*********************Timer0¶¨Ê±********************/
+ 957          #if CONFIG_Timer0 == ENABLED
+              
+              //  TMOD=0x21;             //¶¨Ê±Æ÷T1¹¤×÷ÓÚ¼ÆÊýÄ£Ê½1£¬¶¨Ê±Æ÷T0¹¤×÷ÓÚ¼ÆÊ±Ä£Ê½1£»
+              //  TH1=(65536-46083)/256;    //¶¨Ê±Æ÷T0µÄ¸ß8Î»ÉèÖÃ³õÖµ£¬Ã¿50ms²úÉúÒ»´ÎÖÐ¶Ï
+              //  TL1=(65536-46083)%256;    //¶¨Ê±Æ÷T0µÄµÍ8Î»ÉèÖÃ³õÖµ£¬Ã¿50ms²úÉúÒ»´ÎÖÐ¶Ï
+              //  TH0=(65536-20000)/256;    //¶¨Ê±Æ÷T0µÄ¸ß8Î»ÉèÖÃ³õÖµ£¬Ã¿50ms²úÉúÒ»´ÎÖÐ¶Ï
+              //  TL0=(65536-20000)%256;    //¶¨Ê±Æ÷T0µÄµÍ8Î»ÉèÖÃ³õÖµ£¬Ã¿50ms²úÉúÒ»´ÎÖÐ¶Ï
+              static Timer0_Process  Timer_Process;
+              unsigned char RHCounter;
+              //¶¨Ê±Æ÷0³õÊ¼»¯
+              void Timer0_Init_demo(Timer0_Process T_Process) 
+              {
+                  ET0 = 1;        //ÔÊÐí¶¨Ê±Æ÷0ÖÐ¶Ï
+                  TMOD = 0x01;       //¶¨Ê±Æ÷¹¤×÷·½Ê½Ñ¡Ôñ
+                  TL0 = 0xFF;
+                  TH0 = 0x4B;     //¶¨Ê±Æ÷¸³Óè³õÖµ
+                  TR0 = 1;        //Æô¶¯¶¨Ê±Æ÷
+                  EA = 1;
+                  Timer_Process = T_Process;
+              }
+              
+              //¶¨Ê±Æ÷0ÖÐ¶Ï
+              void Timer0_ISR (void) interrupt 1 using 0 {
+                  TL0 = 0xFF;
+                  TH0 = 0x4B;     //¶¨Ê±Æ÷¸³Óè³õÖµ
+                  RHCounter++;
+              
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 17  
+
+                  if (RHCounter >= 40) //2Ãë
+                  {
+                      Timer_Process();
+                      RHCounter = 0;
+                  }
+              }
+              #endif
+ 991          
+ 992          
+ 993          /********************UART0 *********************/
+ 994          #if CONFIG_UART0 == ENABLED
+              bit UART0_TXD_BUSY = 0;
+              static UART0_RX_Process_T  UART0_RX_Process;
+              void UART0_Send_Byte_Demo(unsigned char a)
+              {
+              
+                SBUF = a;
+                UART0_TXD_BUSY = 1; 
+                while(UART0_TXD_BUSY);  //µÈ´ý·¢ËÍ³É¹¦
+              
+              }
+              
+              
+              
+              
+              /*----------------------------
+              UART1 ·¢ËÍ×Ö·û´®
+              -----------------------------*/
+              void UART0_Send_String_Demo(char *s)
+              {
+                while(*s)//¼ì²â×Ö·û´®½áÊø·û
+                {
+                  UART0_Send_Byte_Demo(*s++);//·¢ËÍµ±Ç°×Ö·û
+                }
+              }
+              
+              
+              void UART0_Init_Demo(UART0_RX_Process_T RX_Process)
+              {
+                
+                TMOD|= 0X20;    //T1  ·½Ê½2  £¬8Î»   ×Ô¶¯ÖØ×°   
+                TH1=0Xfd;
+                TL1=0Xfd;     //9600
+                TR1=1;        // ¶¨Ê±Æ÷1Æô¶¯  
+              
+              
+                SM0=0;      // ÉèÖÃ´®¿ÚµÄ¹¤×÷Ä£Ê½
+                SM1=1;      //·½Ê½1
+              
+              
+                REN=1;     // ÔÊÐí´®¿Ú½ÓÊÕÊý¾Ý   
+              
+                TI=1;
+                ES=1;        // ´®¿ÚÖÐ¶ÏÓ¦Ðí 
+                EA=1;    // ¿ªÆôÖÐ¶Ï 
+                UART0_RX_Process = RX_Process;
+                
+              }
+              unsigned char UART0_RXD[3];
+              unsigned char UART0_RXD_Index =0;
+              void UART0_ISR(void) interrupt 4
+              {
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 18  
+
+                unsigned char a;
+                
+                if(RI)
+                {
+                  RI = 0;
+                  
+                  a = SBUF;
+                  //½ÓÊÕ¶àÊý¾Ý
+                  UART0_RXD[UART0_RXD_Index] = a;
+                  UART0_RXD_Index++;
+                  if(UART0_RXD[0] != CRC)//Ð£ÑéÖ¡
+                  {
+                    UART0_RXD_Index =0;
+                  }
+                  if(UART0_RXD_Index>REV_NUM)//Òª½ÓÊÕµÄÊýÁ¿
+                  {
+                    UART0_RX_Process(UART0_RXD);
+                    UART0_RXD[1] = 0;
+                    UART0_RXD_Index =0; 
+                  }     
+                      
+                }
+                else if(TI)
+                {
+                  TI = 0;
+                  UART0_TXD_BUSY = 0;
+                }
+                else
+                {
+                  RI = 0;
+                  TI = 0;
+                }
+                
+              }
+              #endif
+1081          
+1082          
+1083          
+1084          /********************KEY_MAP *********************/
+1085          #if CONFIG_KEY_MAP == ENABLED
+              
+              //°´¼üÉ¨Ãèº¯Êý :    
+              //¹¦ÄÜ£»Ö»É¨ÃèÒ»¸ö°´¼ü£¬°´¼üÎªºÅÐ¡ÓÅÏÈ  
+              //·µ»Ø¼üÖµ£º
+              //         7    8    9    10     //10:Çå³ýµ¥¼Û²¢ÇÒÇå³ýÖØÁ¿  
+              //         4    5    6    11     //11:Çå³ýµ¥¼Û×îºóÒ»Î»
+              //         1    2    3    12     //12:È¥Æ¤
+              //         14   0    15   13     //14:ÎÞ¹¦ÄÜ£¨ÓÃÓÚÀ©Õ¹£©15£ºÐ¡Êýµã  13£ºÈ·¶¨
+              
+              unsigned char Getkeyboard(void)
+              {
+                  unsigned char number = 0;
+                  unsigned char i;
+                
+                //ÐÐÊäÈëµÍµçÆ½
+                  ROW1=ROW2=ROW3=ROW4=0;
+                //Èç¹ûÁÐÊä³ö²»È«Îª¸ß£¬ÔòËµÃ÷ÓÐ¼ü°´ÏÂ
+                if ((COL1!=1)||(COL2!=1)||(COL3!=1)||(COL4!=1))
+                {
+                   //ÊäÈë0111
+                   ROW1=0;
+                   ROW2=ROW3=ROW4=1;
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 19  
+
+                   for (i=0;i<20;i++);
+                   if (COL1==0) return 1;    // 7
+                   else if (COL2==0) return 2;  //   8
+                   else if (COL3==0) return 3;   // 9
+                   else if (COL4==0) return 10;  //  10
+                   //ÊäÈë1011
+                   ROW2=0;
+                   ROW1=ROW3=ROW4=1;
+                   for (i=0;i<20;i++);
+                   if (COL1==0) return 4;   //4
+                   else if (COL2==0) return 5; //  5
+                   else if (COL3==0) return 6;  // 6
+                   else if (COL4==0) return 11;  // 11
+                   //ÊäÈë1101
+                   ROW3=0;
+                   ROW1=ROW2=ROW4=1;
+                   for (i=0;i<20;i++);
+                   if (COL1==0) return 7;  //1
+                   else if (COL2==0) return 8;    // 2
+                   else if (COL3==0) return 9;    //   3
+                   else if (COL4==0) return 12;   //   12
+                   //ÊäÈë0111
+                   ROW4=0;
+                   ROW1=ROW2=ROW3=1;
+                   for (i=0;i<20;i++);
+                   if (COL1==0) return 14;
+                   else if (COL2==0) return 0;
+                   else if (COL3==0) return 15;
+                   else if (COL4==0) return 13;
+                   //Ã»ÓÐ¼ì²âµ½ÁÐµÍµçÆ½
+                   return 99;
+                }
+                return 99;
+              }
+              
+              #endif
+1144          
+1145          /********************HX711 *********************/
+1146          #if CONFIG_HX711 == ENABLED
+              
+              unsigned long Weight_Maopi;
+              
+              void Delay__hx711_us(void)
+              {
+                _nop_();
+                _nop_();
+              }
+              
+              //Ð£×¼²ÎÊý
+              //ÒòÎª²»Í¬µÄ´«¸ÐÆ÷ÌØÐÔÇúÏß²»ÊÇºÜÒ»ÖÂ£¬Òò´Ë£¬Ã¿Ò»¸ö´«¸ÐÆ÷ÐèÒª½ÃÕýÕâÀïÕâ¸ö²ÎÊý²ÅÄÜÊ¹²âÁ¿ÖµºÜ×¼È·¡£
+              //µ±·¢ÏÖ²âÊÔ³öÀ´µÄÖØÁ¿Æ«´óÊ±£¬Ôö¼Ó¸ÃÊýÖµ¡£
+              //Èç¹û²âÊÔ³öÀ´µÄÖØÁ¿Æ«Ð¡Ê±£¬¼õÐ¡¸ÄÊýÖµ¡£
+              //¸ÃÖµ¿ÉÒÔÎªÐ¡Êý
+              unsigned int GapValue=245;
+              void Delay_ms_HX711(unsigned int n)
+              {
+                unsigned int  i,j;
+                for(i=0;i<n;i++)
+                  for(j=0;j<123;j++);
+              }
+              
+              unsigned long HX711_Read(void)  //ÔöÒæ128
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 20  
+
+              {
+                unsigned long count; 
+                unsigned char i; 
+                  HX711_DOUT=1; 
+                Delay__hx711_us();
+                  HX711_SCK=0; 
+                  count=0; 
+                  while(HX711_DOUT); 
+                  for(i=0;i<24;i++)
+                { 
+                    HX711_SCK=1; 
+                    count=count<<1; 
+                  HX711_SCK=0; 
+                    if(HX711_DOUT)
+                    count++; 
+                } 
+                HX711_SCK=1; 
+                  count=count^0x800000;//µÚ25¸öÂö³åÏÂ½µÑØÀ´Ê±£¬×ª»»Êý¾Ý
+                Delay__hx711_us();
+                HX711_SCK=0;  
+                return(count);
+              }
+              //****************************************************
+              //»ñÈ¡Ã«Æ¤ÖØÁ¿
+              //****************************************************
+              void Get_Maopi()
+              {
+                unsigned long Weight_Maopi_0 = 0;
+              mm: Weight_Maopi_0 = HX711_Read();
+                Delay_ms_HX711(500);
+                Weight_Maopi = HX711_Read();
+                if(Weight_Maopi/GapValue!=Weight_Maopi_0/GapValue)
+                goto mm;
+              
+              } 
+              
+              //****************************************************
+              //³ÆÖØ
+              //****************************************************
+              long Get_Weight()
+              {
+                long Weight_Shiwu;
+                Weight_Shiwu = HX711_Read();
+                Weight_Shiwu = Weight_Shiwu - Weight_Maopi;   //»ñÈ¡¾»ÖØ
+                
+                Weight_Shiwu = (unsigned int)((float)Weight_Shiwu/GapValue);  //¼ÆËãÊµÎïµÄÊµ¼ÊÖØÁ¿                                
+                return Weight_Shiwu;
+              }
+              #endif
+1219          
+1220          /********************HRSR04 *********************/
+1221          #if CONFIG_HRSR04 == ENABLED
+              sbit Trig_P    = P2^2;    // ³¬Éù²¨Ä£¿éµÄTrig¹Ü½Å
+              sbit Echo_P    = P2^3;    // ³¬Éù²¨Ä£¿éµÄEcho¹Ü½Å
+              /*********************************************************/
+              // ºÁÃë¼¶µÄÑÓÊ±º¯Êý£¬timeÊÇÒªÑÓÊ±µÄºÁÃëÊý
+              /*********************************************************/
+              void HRSR04_DelayMs(unsigned int time)
+              {
+                unsigned int i,j;
+                for(i=0;i<time;i++)
+                  for(j=0;j<112;j++);
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 21  
+
+              }
+              void HRSR04_Timer_init()
+              {
+                  TMOD = 0x01;                      // Ñ¡Ôñ¶¨Ê±Æ÷0£¬²¢ÇÒÈ·¶¨ÊÇ¹¤×÷·½Ê½1£¨ÎªÁË³¬Éù²¨Ä£¿é²âÁ¿¾àÀë¼ÆÊ±ÓÃµÄ£©
+              }
+              
+              unsigned int GetDistance(void)
+              {
+                unsigned int ss;          // ÓÃÓÚ¼ÇÂ¼²âµÃµÄ¾àÀë
+                //uartÄÇ±ß¿ªÆôÁËTR0²»ÖªµÀÎªÊ²Ã´
+                TR0=0;
+                TH0=0;
+                TL0=0;
+              
+                Trig_P=1;         // ¸ø³¬Éù²¨Ä£¿éÒ»¸ö¿ªÊ¼Âö³å
+                HRSR04_DelayMs(1);
+                Trig_P=0;
+              
+                while(!Echo_P);   // µÈ´ý³¬Éù²¨Ä£¿éµÄ·µ»ØÂö³å
+                TR0=1;            // Æô¶¯¶¨Ê±Æ÷£¬¿ªÊ¼¼ÆÊ±
+                while(Echo_P);    // µÈ´ý³¬Éù²¨Ä£¿éµÄ·µ»ØÂö³å½áÊø
+                TR0=0;            // Í£Ö¹¶¨Ê±Æ÷£¬Í£Ö¹¼ÆÊ±
+              
+                ss=((TH0*256+TL0)*0.034)/2;   // ¾àÀëcm=£¨Ê±¼äus * ËÙ¶Ècm/us£©/2
+              
+                return ss;
+              }
+              
+              /* 
+              HRSR04_Timer_init();  
+              while(1)
+              {
+                ...
+                Distanc = GetDistance();
+              }
+              */
+              #endif
+1269          
+1270          /********************MP3_TF_16P *********************/
+1271          #if CONFIG_MP3_TF == ENABLED
+              sbit voice_busy = P2^0;
+              unsigned char a;
+              
+              //9600bps
+              void uart_init()
+              {
+                TMOD |= 0x20;
+                TH1 = 0xfd;
+                TL1 = 0xfd;
+                TR1 = 1;
+                SM0 = 0;
+                SM1 = 1;
+                REN = 1;
+                EA = 1;
+                ES = 1;
+                TI = 1;
+                
+                //TH0=0x4c;
+                //TL0=0x00;   //×°ÔØ¶¨Ê±Æ÷1Êý¾Ý
+                //TR0=1;      //¿ªÊ¼¶¨Ê±
+                //ET0=1;      //ÊÇÄÜ¶¨Ê±Æ÷1
+              
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 22  
+
+              }
+              
+              void UartSendByte(unsigned char byte)
+              {
+                SBUF = byte;
+                while(!TI);
+                  TI = 0;
+              }
+              
+              
+              void UartSendString(unsigned char *string)
+              {
+                while(*string)
+                {
+                  UartSendByte(*string++);
+                }
+              }
+              
+              
+              void ser() interrupt 4
+              {
+                RI = 0;
+                a = SBUF;
+              }
+              
+              static unsigned char Send_buf[10] = {0} ;
+              static unsigned char Recv_buf[10] = {0} ;
+              
+              static unsigned char SendDataLen = 0 ;
+              static unsigned char ResendDataLen = 0 ;
+              
+              
+              /*****************************************************************************************************
+               - ¹¦ÄÜÃèÊö£º
+               - Á¥ÊôÄ£¿é£º
+               - ²ÎÊýËµÃ÷£º
+               - ·µ»ØËµÃ÷£º
+               - ×¢£º
+              *****************************************************************************************************/
+              
+              /*****************************************************************************************************
+               - ¹¦ÄÜÃèÊö£º´®¿Ú·¢ËÍÒ»Ö¡Êý¾Ý
+              
+              *****************************************************************************************************/
+              
+              
+              void SendCmd(unsigned char len)
+              {
+                  unsigned char i = 0 ;
+              
+                  //UartSendByte(0x7E); //??
+                  //UartSendByte(0xff); //??  
+                  //UartSendByte(0x7e);
+                  for(i=0; i<len; i++)//??
+                  {
+                  UartSendByte(Send_buf[i]) ;
+                  }
+                  //UartSendByte(0xEF) ;//??
+              }
+              
+              /*****************************************************************************************************
+               - ¹¦ÄÜÃèÊö£ºÇóºÍÐ£Ñé
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 23  
+
+               - Á¥ÊôÄ£¿é£º
+               - ²ÎÊýËµÃ÷£º
+               - ·µ»ØËµÃ÷£º
+               - ×¢£º       ºÍÐ£ÑéµÄË¼Â·ÈçÏÂ
+                            ·¢ËÍµÄÖ¸Áî£¬È¥µôÆðÊ¼ºÍ½áÊø¡£½«ÖÐ¼äµÄ6¸ö×Ö½Ú½øÐÐÀÛ¼Ó£¬×îºóÈ¡·´Âë
+                            ½ÓÊÕ¶Ë¾Í½«½ÓÊÕµ½µÄÒ»Ö¡Êý¾Ý£¬È¥µôÆðÊ¼ºÍ½áÊø¡£½«ÖÐ¼äµÄÊý¾ÝÀÛ¼Ó£¬ÔÙ¼ÓÉÏ½ÓÊÕµ½µÄÐ£Ñé
+                            ×Ö½Ú¡£¸ÕºÃÎª0£¬ÕâÑù¾Í´ú±í½ÓÊÕµ½µÄÊý¾ÝÍêÈ«ÕýÈ·
+              *****************************************************************************************************/
+              
+              void DoSum( unsigned char *Str, unsigned char len)
+              {
+                  unsigned int xorsum = 0;
+                  unsigned char i;
+              
+                  for(i=0; i<len; i++)
+                  {
+                      xorsum  = xorsum + Str[i];
+                  }
+                xorsum     = 0 -xorsum;
+                *(Str+i)   = (unsigned char)(xorsum >>8);
+                *(Str+i+1) = (unsigned char)(xorsum & 0x00ff);
+              }
+              
+              
+              /*****************************************************************************************************
+               - ¹¦ÄÜÃèÊö£º´®¿ÚÏòÍâ·¢ËÍÃüÁî¡¾°üÀ¨¿ØÖÆºÍ²éÑ¯¡¿
+               - Á¥ÊôÄ£¿é£ºÍâ²¿
+               - ²ÎÊýËµÃ÷£ºCMD£º±íÊ¾¿ØÖÆÖ¸Áî£¬Çë²éÑ¯Ö¸Áî±í£¬»¹°üÀ¨²éÑ¯µÄÏà¹ØÖ¸Áî
+                            feedback£ºÊÇ·ñÐèÒªÓ¦´ð[0£º²»ÐèÒªÓ¦´ð£¬1£ºÐèÒªÓ¦´ð]
+                            data£º´«ËÍµÄ²ÎÊý
+               - ·µ»ØËµÃ÷£º
+               - ×¢£º
+              *****************************************************************************************************/
+              
+              
+              void Uart_SendCMD(unsigned char CMD ,unsigned char feedback , unsigned int dat)
+              {
+                  TR0 = 0;
+                  while(voice_busy == 0);
+                  Send_buf[0] = 0x7e;    //±£Áô×Ö½Ú
+                  Send_buf[1] = 0xff;    //±£Áô×Ö½Ú
+                  Send_buf[2] = 0x06;    //³¤¶È
+                  Send_buf[3] = CMD;     //¿ØÖÆÖ¸Áî
+                  Send_buf[4] = feedback;//ÊÇ·ñÐèÒª·´À¡
+                  Send_buf[5] = (unsigned char)(dat >> 8);//datah
+                  Send_buf[6] = (unsigned char)(dat);     //datal
+                  Send_buf[9] = 0xef;
+                  DoSum(&Send_buf[1],6);        //Ð£Ñé
+                  SendCmd(10);       //·¢ËÍ´ËÖ¡Êý¾Ý
+                  TR0 =1;
+              }
+              //****************************************************
+              //MSÑÓÊ±º¯Êý(12M¾§ÕñÏÂ²âÊÔ)
+              //****************************************************
+              void Delay_ms(unsigned int n) {
+                  unsigned int  i,j;
+                  for(i=0; i<n; i++)
+                      for(j=0; j<123; j++);
+              }
+              /* demo
+                //´®¿Ú³õÊ¼»¯
+                uart_init();
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 24  
+
+                EA = 1;
+                  //ÓïÒôÌáÊ¾
+                Uart_SendCMD(0x06,0,30);
+                Delay_ms(500);
+                Uart_SendCMD(0x06,0,30);
+                Delay_ms(500);
+                Uart_SendCMD(0x03,0,VOICE_INIT);//»¶Ó­Ê¹ÓÃÓïÒôµç×Ó³Æ
+                Delay_ms(500);
+                while(1)
+                {
+                  ...
+                  Uart_SendCMD(0x03,0,(dat/100));//°ÙÎ»
+                  Delay_ms(100);
+                  Uart_SendCMD(0x03,0,12);//°Ù
+                  Delay_ms(100);    
+                }
+              */
+              #endif
+1436          
+1437          /********************SHT11 *********************/
+1438          #if CONFIG_SHT11 == ENABLED
+              #define noACK 0       //¼ÌÐø´«ÊäÊý¾Ý£¬ÓÃÓÚÅÐ¶ÏÊÇ·ñ½áÊøÍ¨Ñ¶
+              #define ACK   1             //½áÊøÊý¾Ý´«Êä£»
+                            //µØÖ·  ÃüÁî  ¶Á/Ð´
+              #define STATUS_REG_W 0x06   //000   0011    0
+              #define STATUS_REG_R 0x07   //000   0011    1
+              #define MEASURE_TEMP 0x03   //000   0001    1
+              #define MEASURE_HUMI 0x05   //000   0010    1
+              #define RESET        0x1e   //000   1111    0
+              //Ð´×Ö½Ú³ÌÐò
+              char s_write_byte(unsigned char value)   
+              { 
+                unsigned char i,error=0; 
+                for (i=0x80;i>0;i>>=1)             //¸ßÎ»Îª1£¬Ñ­»·ÓÒÒÆ
+                { 
+                  if (i&value) DATA=1;          //ºÍÒª·¢ËÍµÄÊýÏàÓë£¬½á¹ûÎª·¢ËÍµÄÎ»
+                    else DATA=0;                        
+                    SCK=1;                          
+                    _nop_();_nop_();_nop_();        //ÑÓÊ±3us 
+                    SCK=0;
+                }
+                DATA=1;                           //ÊÍ·ÅÊý¾ÝÏß
+                SCK=1;                            
+                error=DATA;                       //¼ì²éÓ¦´ðÐÅºÅ£¬È·ÈÏÍ¨Ñ¶Õý³£
+                _nop_();_nop_();_nop_();
+                SCK=0;        
+                DATA=1;
+                return error;                     //error=1 Í¨Ñ¶´íÎó
+              }
+              //¶Á×Ö½Ú³ÌÐò
+              char s_read_byte(unsigned char ack)
+              { 
+                unsigned char i,val=0;
+                DATA=1;                           //ÊÍ·ÅÊý¾ÝÏß
+                for(i=0x80;i>0;i>>=1)             //¸ßÎ»Îª1£¬Ñ­»·ÓÒÒÆ
+                { 
+                  SCK=1;                         
+                    if(DATA) val=(val|i);        //¶ÁÒ»Î»Êý¾ÝÏßµÄÖµ 
+                    SCK=0;       
+                }
+                DATA=!ack;                        //Èç¹ûÊÇÐ£Ñé£¬¶ÁÈ¡Íêºó½áÊøÍ¨Ñ¶£»
+                SCK=1;                            
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 25  
+
+                _nop_();_nop_();_nop_();          //ÑÓÊ±3us 
+                SCK=0;   
+                _nop_();_nop_();_nop_();       
+                DATA=1;                           //ÊÍ·ÅÊý¾ÝÏß
+                return val;
+              }
+              //Æô¶¯´«Êä
+              void s_transstart(void)
+              // generates a transmission start 
+              //       _____         ________
+              // DATA:      |_______|
+              //           ___     ___
+              // SCK : ___|   |___|   |______
+              { 
+                  DATA=1; SCK=0;                   //×¼±¸
+                  _nop_();
+                  SCK=1;
+                  _nop_();
+                  DATA=0;
+                  _nop_();
+                  SCK=0; 
+                   _nop_();_nop_();_nop_();
+                  SCK=1;
+                  _nop_();
+                  DATA=1;     
+                  _nop_();
+                  SCK=0;     
+              }
+              //Á¬½Ó¸´Î»
+              void s_connectionreset(void)
+              // communication reset: DATA-line=1 and at least 9 SCK cycles followed by transstart
+              //       _____________________________________________________         ________
+              // DATA:                                                      |_______|
+              //          _    _    _    _    _    _    _    _    _        ___     ___
+              // SCK : __| |__| |__| |__| |__| |__| |__| |__| |__| |______|   |___|   |______
+              { 
+                unsigned char i; 
+                DATA=1; SCK=0;                    //×¼±¸
+                for(i=0;i<9;i++)                  //DATA±£³Ö¸ß£¬SCKÊ±ÖÓ´¥·¢9´Î£¬·¢ËÍÆô¶¯´«Êä£¬Í¨Ñ¸¼´¸´Î»
+                { 
+                  SCK=1;
+                    SCK=0;
+                }
+                s_transstart();                   //Æô¶¯´«Êä
+              }
+              //Èí¸´Î»³ÌÐò
+              char s_softreset(void)
+              // resets the sensor by a softreset 
+              { 
+                unsigned char error=0; 
+                s_connectionreset();              //Æô¶¯Á¬½Ó¸´Î»
+                error+=s_write_byte(RESET);       //·¢ËÍ¸´Î»ÃüÁî
+                return error;                     //error=1 Í¨Ñ¶´íÎó
+              }          
+              //ÎÂÊª¶È²âÁ¿
+              char s_measure(unsigned char *p_value, unsigned char *p_checksum, unsigned char mode)
+              // ½øÐÐÎÂ¶È»òÕßÊª¶È×ª»»£¬ÓÉ²ÎÊýmode¾ö¶¨×ª»»ÄÚÈÝ£»
+              { 
+              //  enum {TEMP,HUMI};    //ÒÑ¾­ÔÚÍ·ÎÄ¼þÖÐ¶¨Òå
+                unsigned error=0;
+                unsigned int i;
+              
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 26  
+
+                s_transstart();                   //Æô¶¯´«Êä
+                switch(mode)                     //Ñ¡Ôñ·¢ËÍÃüÁî
+                  { 
+                  case TEMP : error+=s_write_byte(MEASURE_TEMP); break;      //²âÁ¿ÎÂ¶È
+                    case HUMI : error+=s_write_byte(MEASURE_HUMI); break;      //²âÁ¿Êª¶È
+                    default     : break; 
+                }
+                for (i=0;i<65535;i++) if(DATA==0) break; //µÈ´ý²âÁ¿½áÊø
+                if(DATA) error+=1;                // Èç¹û³¤Ê±¼äÊý¾ÝÏßÃ»ÓÐÀ­µÍ£¬ËµÃ÷²âÁ¿´íÎó 
+                *(p_value) =s_read_byte(ACK);    //¶ÁµÚÒ»¸ö×Ö½Ú£¬¸ß×Ö½Ú (MSB)
+                *(p_value+1)=s_read_byte(ACK);    //¶ÁµÚ¶þ¸ö×Ö½Ú£¬µÍ×Ö½Ú (LSB)
+                *p_checksum =s_read_byte(noACK); //read CRCÐ£ÑéÂë
+                return error;          // error=1 Í¨Ñ¶´íÎó
+              }
+              //ÎÂÊª¶ÈÖµ±ê¶È±ä»»¼°ÎÂ¶È²¹³¥
+              void calc_sth10(float *p_humidity ,float *p_temperature)
+              { 
+                
+                const float C1=-8.0;              // 12Î»Êª¶È¾«¶È ÐÞÕý¹«Ê½
+                const float C2=+0.0405;           // 12Î»Êª¶È¾«¶È ÐÞÕý¹«Ê½
+                const float C3=-0.0000028;        // 12Î»Êª¶È¾«¶È ÐÞÕý¹«Ê½
+                const float T1=+0.01;             // 14Î»ÎÂ¶È¾«¶È 5VÌõ¼þ  ÐÞÕý¹«Ê½
+                const float T2=+0.00008;          // 14Î»ÎÂ¶È¾«¶È 5VÌõ¼þ  ÐÞÕý¹«Ê½
+                
+                float rh=*p_humidity;             // rh:      12Î» Êª¶È 
+                float t=*p_temperature;           // t:       14Î» ÎÂ¶È
+                float rh_lin;                     // rh_lin: Êª¶È linearÖµ
+                float rh_true;                    // rh_true: Êª¶È tureÖµ
+                float t_C;                        // t_C   : ÎÂ¶È ¡æ
+                
+                t_C=t*0.01 - 40;                  //²¹³¥ÎÂ¶È
+                rh_lin=C3*rh*rh + C2*rh + C1;     //Ïà¶ÔÊª¶È·ÇÏßÐÔ²¹³¥
+                rh_true=1*(T1+T2*rh)+rh_lin;   //Ïà¶ÔÊª¶È¶ÔÓÚÎÂ¶ÈÒÀÀµÐÔ²¹³¥
+                if(rh_true>100)rh_true=100;       //Êª¶È×î´óÐÞÕý
+                if(rh_true<0.1)rh_true=0.1;       //Êª¶È×îÐ¡ÐÞÕý
+              
+                *p_temperature=t_C;               //·µ»ØÎÂ¶È½á¹û
+                *p_humidity=rh_true;              //·µ»ØÊª¶È½á¹û
+              }
+              
+              /*demo
+              void main()
+              {
+                unsigned int temp,humi;   //¶¨ÒåÎÂ¶ÈºÍÊª¶È±äÁ¿
+                value humi_val,temp_val;    //¶¨ÒåÁ½¸ö¹²Í¬Ìå£¬Ò»¸öÓÃÓÚÊª¶È£¬Ò»¸öÓÃÓÚÎÂ¶È
+                unsigned char error;        //ÓÃÓÚ¼ìÑéÊÇ·ñ³öÏÖ´íÎó
+                unsigned char checksum;     //CRC      
+                uchar wendu[6];         //ÓÃÓÚ¼ÇÂ¼ÎÂ¶È
+                uchar shidu[6];         //ÓÃÓÚ¼ÇÂ¼Êª¶È  
+                value humi_val,temp_val;    //¶¨ÒåÁ½¸ö¹²Í¬Ìå£¬Ò»¸öÓÃÓÚÊª¶È£¬Ò»¸öÓÃÓÚÎÂ¶È
+                while(1)
+                {
+                  error=0;             //³õÊ¼»¯error=0£¬¼´Ã»ÓÐ´íÎó
+                  error+=s_measure((unsigned char*)&temp_val.i,&checksum,TEMP); //ÎÂ¶È²âÁ¿
+                  error+=s_measure((unsigned char*)&humi_val.i,&checksum,HUMI); //Êª¶È²âÁ¿
+                  if(error!=0) 
+                    s_connectionreset();                 ////Èç¹û·¢Éú´íÎó£¬ÏµÍ³¸´Î»   
+                  else
+                  {
+                      humi_val.f=(float)humi_val.i;                   //×ª»»Îª¸¡µãÊý
+                      temp_val.f=(float)temp_val.i;                   //×ª»»Îª¸¡µãÊý
+                      calc_sth10(&humi_val.f,&temp_val.f);            //ÐÞÕýÏà¶ÔÊª¶È¼°ÎÂ¶È
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 27  
+
+              //      dew_point=calc_dewpoint(humi_val.f,temp_val.f); //¼ÆËãe dew_point
+                      temp=temp_val.f*10;
+                      humi=humi_val.f*10;   
+                  }
+                }
+              
+              }
+              
+              
+              */
+              
+              #endif
+1616          
+1617          /********************DHT11 *********************/
+1618          #if CONFIG_DHT11 == ENABLED
+              
+              unsigned char U8FLAG,U8temp,U8comdata;
+              
+              void Delay(unsigned int j)
+              {      
+                unsigned char i;
+                for(;j>0;j--)
+                {   
+                  for(i=0;i<27;i++);
+                }
+              }
+              void  Delay_10us(void)
+              {
+                unsigned char i;
+                i--;
+                i--;
+                i--;
+                i--;
+                i--;
+                i--;
+              }
+                
+              void  COM(void)     //
+              {
+              
+                unsigned char i;
+              
+                for(i=0;i<8;i++)     
+                {
+              
+                  U8FLAG=2; 
+                  while((!DTH_PIN)&&U8FLAG++);
+                  Delay_10us();
+                  Delay_10us();
+                  Delay_10us();
+                  U8temp=0;
+                  if(DTH_PIN)U8temp=1;
+                  U8FLAG=2;
+                  while((DTH_PIN)&&U8FLAG++);
+                  //³¬Ê±ÔòÌø³öforÑ­»·     
+                  if(U8FLAG==1)break;
+                  //ÅÐ¶ÏÊý¾ÝÎ»ÊÇ0»¹ÊÇ1   
+              
+                  // Èç¹û¸ßµçÆ½¸ß¹ýÔ¤¶¨0¸ßµçÆ½ÖµÔòÊý¾ÝÎ»Îª 1 
+              
+                  U8comdata<<=1;
+                  U8comdata|=U8temp;        //0
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 28  
+
+                }//rof
+              
+              }
+              
+                //--------------------------------
+                //-----Êª¶È¶ÁÈ¡×Ó³ÌÐò ------------
+                //--------------------------------
+                //----ÒÔÏÂ±äÁ¿¾ùÎªÈ«¾Ö±äÁ¿--------
+                //----ÎÂ¶È¸ß8Î»== U8T_data_H------
+                //----ÎÂ¶ÈµÍ8Î»== U8T_data_L------
+                //----Êª¶È¸ß8Î»== U8RH_data_H-----
+                //----Êª¶ÈµÍ8Î»== U8RH_data_L-----
+                //----Ð£Ñé 8Î» == U8checkdata-----
+                //----µ÷ÓÃÏà¹Ø×Ó³ÌÐòÈçÏÂ----------
+                //---- Delay();, Delay_10us();,COM(); 
+                //--------------------------------
+              
+              char DHT11_RH(unsigned char* arry)
+              {
+                unsigned char U8T_data_H_temp,U8T_data_L_temp,U8RH_data_H_temp,U8RH_data_L_temp,U8checkdata_temp;
+                //Ö÷»úÀ­µÍ18ms 
+                DTH_PIN=0;
+                Delay(180);
+                DTH_PIN=1;
+                //×ÜÏßÓÉÉÏÀ­µç×èÀ­¸ß Ö÷»úÑÓÊ±20us
+                Delay_10us();
+                Delay_10us();
+                Delay_10us();
+                Delay_10us();
+                //Ö÷»úÉèÎªÊäÈë ÅÐ¶Ï´Ó»úÏìÓ¦ÐÅºÅ 
+                DTH_PIN=1;
+                //ÅÐ¶Ï´Ó»úÊÇ·ñÓÐµÍµçÆ½ÏìÓ¦ÐÅºÅ Èç²»ÏìÓ¦ÔòÌø³ö£¬ÏìÓ¦ÔòÏòÏÂÔËÐÐ   
+                if(!DTH_PIN)     //T !    
+                {
+                  U8FLAG=2;
+                  //ÅÐ¶Ï´Ó»úÊÇ·ñ·¢³ö 80us µÄµÍµçÆ½ÏìÓ¦ÐÅºÅÊÇ·ñ½áÊø   
+                  while((!DTH_PIN)&&U8FLAG++);
+                  U8FLAG=2;
+                  //ÅÐ¶Ï´Ó»úÊÇ·ñ·¢³ö 80us µÄ¸ßµçÆ½£¬Èç·¢³öÔò½øÈëÊý¾Ý½ÓÊÕ×´Ì¬
+                  while((DTH_PIN)&&U8FLAG++);
+                  //Êý¾Ý½ÓÊÕ×´Ì¬     
+                  COM();
+                  U8RH_data_H_temp=U8comdata;
+                  COM();
+                  U8RH_data_L_temp=U8comdata;
+                  COM();
+                  U8T_data_H_temp=U8comdata;
+                  COM();
+                  U8T_data_L_temp=U8comdata;
+                  COM();
+                  U8checkdata_temp=U8comdata;
+                  DTH_PIN=1;
+                  //Êý¾ÝÐ£Ñé 
+              
+                  U8temp=(U8T_data_H_temp+U8T_data_L_temp+U8RH_data_H_temp+U8RH_data_L_temp);
+                  if(U8temp==U8checkdata_temp)
+                  {
+                    arry[0]=U8RH_data_H_temp;
+                    arry[1]=U8RH_data_L_temp;
+                    arry[2]=U8T_data_H_temp;
+                    arry[3]=U8T_data_L_temp;
+                    return TRUE;
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 29  
+
+                  //U8checkdata=U8checkdata_temp;
+                  }else
+                    return FALSE;
+                }//fi
+                return FALSE;
+              }
+              /*Demo  
+              unsigned char RH_Value[4];
+              while(1)
+              {
+                if(DHT11_RH(RH_Value) == TRUE)
+                {
+                  Lcd1602_Display_Three_bit(0,0,RH_Value[0]);//¶Á³öÎÂÊª¶È£¬Ö»È¡ÕûÊý²¿·Ö
+                  Lcd1602_Display_Three_bit(1,0,RH_Value[2]);
+                }
+              }
+              */
+              #endif
+1746          
+1747          
+1748          /********************LCD12864 *********************/
+1749          #if CONFIG_LCD12864_LIB == ENABLED
+              
+              /********************************************
+              Description:  LCD12864 Çý¶¯ ,²ÉÓÃ´®ÐÐ·½Ê½,
+              ********************************************/ 
+              
+              
+              #define BIT(n)  (1<<(n))
+              #define SID_0   Lcd_Rw=0;
+              #define SID_1   Lcd_Rw=1; 
+              #define SCLK_0  Lcd_En=0;
+              #define SCLK_1  Lcd_En=1; 
+              //15½Å PSB ½ÓµÍµçÆ½
+              
+              //º¯Êý  delay(uchar z)
+              //¹¦ÄÜÄÜ  ÑÓÊ±
+              
+              void Delay1(unsigned char z)
+              {
+                unsigned char a,b;
+                for(a=z;a>0;a--)
+                 for(b=200;b>0;b--);  
+              } 
+              
+              void SendByte(unsigned char bye)
+              {
+                unsigned char i;
+                for(i=0;i<8;i++)
+                {
+                  if((bye<<i)&0x80){SID_1;}
+                  else {SID_0;}
+                  SCLK_1;
+              
+                  SCLK_0;
+              
+                }
+              }
+              
+              void Lcd_WriteCom(unsigned char CMD)
+              {
+                SendByte(0xf8);
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 30  
+
+                SendByte(CMD&0xf0);
+                SendByte((CMD<<4)&0xf0);
+                    Delay1(20);
+                  Delay1(20);
+                  Delay1(20);
+              }
+              
+              void Lcd_WriteDate(unsigned char Data)
+              { SendByte(0xf8+2);
+                SendByte(Data&0xf0);
+                SendByte((Data<<4)&0xf0);
+              }
+              
+              void LCDInit()
+              {/* RST=0;
+                delay1MS(50);
+                RST=1;          */
+                lcd_RS=1;
+                  Lcd_WriteCom(0x34);//¹¦ÄÜÉèÖÃ£¬Ò»´ÎËÍ8Î»Êý¾Ý£¬»ù±¾Ö¸Áî¼¯
+                  Lcd_WriteCom(0x30);//0000,1100  ÕûÌåÏÔÊ¾£¬ÓÎ±êoff£¬ÓÎ±êÎ»ÖÃoff
+                  Lcd_WriteCom(0x01);//0000,0001 ÇåDDRAM
+                  Lcd_WriteCom(0x06);//0000,0010 DDRAMµØÖ·¹éÎ»
+                  Lcd_WriteCom(0x0c);//1000,0000 Éè¶¨DDRAM 7Î»µØÖ·000£¬0000µ½µØÖ·¼ÆÊýÆ÷AC//     
+              }
+              
+              /*****************************
+              ·¢ËÍ×Ö·û´®
+              *****************************/
+              //void show_str(uchar const *s)//¸ÄAVRÈ¥µôconst
+              void  Lcd_String(const unsigned char  *str)
+              {
+               while(*str !='\0')
+                 { 
+                    Lcd_WriteDate(*str++);
+              
+                 }
+              }
+              
+              void Lcd_Display2data(unsigned char line,unsigned char list,unsigned char Date)
+              {
+                  unsigned char i;
+                   unsigned char ta[]={0,0,'\0'};   //ÓÃÒ»¸öÊý×éÀ´×°Êý
+                   list=list &0x07;            //ÏÞÖÆÔÚ 0-7ÁÐ
+                   switch(line){
+                      case 1:   Lcd_WriteCom(0x80+list);break;  //µÚÒ»ÐÐ
+                      case 2:   Lcd_WriteCom(0x90+list);break;  //µÚ¶þÐÐ
+                      case 3:   Lcd_WriteCom(0x88+list);break;  //µÚÈýÐÐ
+                      case 4:   Lcd_WriteCom(0x98+list);break;  //µÚËÄÐÐ
+                      default : break;
+                
+                   }
+                 for(i=2;i>0;i--)
+                 {                //Ñ­»·ËÄ´Î°ÑËÄ¸öÊý´Ó¸ßµ½µÍ×°Èëta
+                  ta[i-1]=Date%10+48;
+                  Date=Date/10;
+                 }
+                  Lcd_String(ta);
+              } 
+              void Lcd_Display3data(unsigned char line,unsigned char list,unsigned int Date)
+              {
+                  unsigned char i;
+                   unsigned char ta[]={0,0,0,0,'\0'};   //ÓÃÒ»¸öÊý×éÀ´×°Êý
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 31  
+
+                   list=list &0x07;            //ÏÞÖÆÔÚ 0-7ÁÐ
+                   switch(line){
+                      case 1:   Lcd_WriteCom(0x80+list);break;  //µÚÒ»ÐÐ
+                      case 2:   Lcd_WriteCom(0x90+list);break;  //µÚ¶þÐÐ
+                      case 3:   Lcd_WriteCom(0x88+list);break;  //µÚÈýÐÐ
+                      case 4:   Lcd_WriteCom(0x98+list);break;  //µÚËÄÐÐ
+                      default : break;
+                
+                   }
+                 for(i=3;i>0;i--)
+                 {                //Ñ­»·ËÄ´Î°ÑËÄ¸öÊý´Ó¸ßµ½µÍ×°Èëta
+                  ta[i-1]=Date%10+48;
+                  Date=Date/10;
+                 }
+                  Lcd_String(ta);
+              } 
+              
+              
+               
+              
+               ////////////////////////////////////////////////////////////////////
+              //º¯Êý    Lcd_init(uchar com)
+              //¹¦ÄÜ    ¾«È·ÆÁÄ»ÏÔÊ¾×Ö·û´®
+              //²ÎÊý    line  Òº¾§ÆÁµÄµÚ¼¸ÐÐ  list  µÚ¼¸¸öÎ»ÖÃ¿ªÊ¼Ð´ £¨×î¶à8¸öÁÐ£©  *pÒªÐ´µÄ×Ö·û´®
+              void  Lcd_ShowSring(unsigned char line,unsigned char list,unsigned char *p)
+              {
+                 switch(line){
+                      case 1:   Lcd_WriteCom(0x80+list);break;  //µÚÒ»ÐÐ
+                      case 2:   Lcd_WriteCom(0x90+list);break;  //µÚ¶þÐÐ
+                      case 3:   Lcd_WriteCom(0x88+list);break;  //µÚÈýÐÐ
+                      case 4:   Lcd_WriteCom(0x98+list);break;  //µÚËÄÐÐ
+                      default : break;
+                
+                   }
+              
+                    Lcd_String(p);
+              
+              }
+              
+              /*demo
+              
+                LCDInit();  //lcd12864³õÊ¼»¯
+                Lcd_ShowSring(1,0,"ÅïÄÚÎÂÊª¶È¹âÕÕ");
+                Lcd_ShowSring(2,0,"ÎÂ¶È:");
+                Lcd_ShowSring(3,0,"Êª¶È:");
+                Lcd_ShowSring(4,0,"¹â¶È:");
+                while(1);
+              
+              */
+              #endif
+1902          
+1903          
+1904          /********************ESP8266*********************/
+1905          #if CONFIG_ESP8266 == ENABLED
+              unsigned char a;
+              void us_delay(unsigned char t) 
+              {  
+                while(t--); 
+              }  
+              
+              void Esp8266_Delay_Ms(int cnt)
+              {
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 32  
+
+                unsigned char i, j;
+              
+                while(cnt--)
+                {
+              
+                  i = 2;
+                  j = 199;
+                  do
+                  {
+                    while (--j);
+                  } while (--i);
+                }
+              }
+              //*********Ö÷º¯Êý*****************
+              //9600bps
+              void ESP8266_uart_init()
+              {
+                TMOD = 0x20;
+                TH1 = 0xfd;
+                TL1 = 0xfd;
+                TR1 = 1;
+                SM0 = 0;
+                SM1 = 1;
+                REN = 1;
+                EA = 1;
+                ES = 1;
+                TI = 1;
+              }
+              void UartSendByte(unsigned char byte)
+              {
+                SBUF = byte;
+                while(!TI);
+                  TI = 0;
+              }
+              
+              
+              void UartSendString(unsigned char *string)
+              {
+                while(*string)
+                {
+                  UartSendByte(*string++);
+                }
+              }
+              
+              
+              void ser() interrupt 4
+              {
+                if(RI)
+                {
+                  RI = 0;
+                  a = SBUF;
+                }
+              }
+              
+              
+              /******************************************************************** 
+              Ãû³Æ£ºWIFIÄ£¿éÉèÖÃº¯Êý  ×÷ÓÃ: Æô¶¯Ä£¿é£¬ÒÔ±ã¿ÉÒÔÊµÏÖÎÞÏß½ÓÈëºÍ¿ØÖÆ  
+              ********************************************************************/ 
+              void ESP8266_Set(unsigned char *puf) 
+                {                         // Êý×éÖ¸Õë*pufÖ¸Ïò×Ö·û´®Êý×é
+                  while(*puf!='\0') 
+                  {     //Óöµ½¿Õ¸ñÌø³öÑ­»·
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 33  
+
+                      UartSendByte(*puf);     //ÏòWIFIÄ£¿é·¢ËÍ¿ØÖÆÖ¸Áî¡£
+                      Esp8266_Delay_Ms(5);
+                      puf++;
+                  }
+                  Esp8266_Delay_Ms(5);
+                  UartSendByte('\r');       //»Ø³µ
+                  Esp8266_Delay_Ms(5);
+                  UartSendByte('\n');         //»»ÐÐ
+              }
+              void Esp8266_init()
+              {
+                  ESP8266_uart_init();
+                  Esp8266_Delay_Ms(100);
+                  ESP8266_Set("AT+CWMODE=2");               //ÉèÖÃÂ·ÓÉÆ÷Ä£Ê½1 station,Ä£Ê½2 AP,Ä£Ê½3 station+AP»ìºÏÄ£Ê½   ÉèÖÃÇ°
+             -wifiµÄ²¨ÌØÂÊÉèÖÃ³É9600
+                  Esp8266_Delay_Ms(300);
+                  ESP8266_Set("AT+RST");                  //ÖØÐÂÆô¶¯wifiÄ£¿é
+                  Esp8266_Delay_Ms(300);
+              //    ESP8266_Set("AT+CWSAP=\"wifi\",\"12345678\",11,4");   //AT+CWSAP="wifi_yuan","12345678",11,4  ÉèÖÃÄ£
+             -¿éSSID:WIFI, PWD:ÃÜÂë ¼°°²È«ÀàÐÍ¼ÓÃÜÄ£Ê½£¨WPA2-PSK£©
+                  ESP8266_Set("AT+CWSAP=\"wifi_yuxia\",\"12345678\",11,4");
+                  Esp8266_Delay_Ms(300);
+              //    ESP8266_Set("AT+CIPMUX=1");               //¿ªÆô¶àÁ¬½ÓÄ£Ê½£¬ÔÊÐí¶à¸ö¸÷¿Í»§¶Ë½ÓÈë
+                  ESP8266_Set("AT+CIPMUX=1");               //¿ªÆôµ¥Á¬½ÓÄ£Ê½
+                  Esp8266_Delay_Ms(300);
+                  ESP8266_Set("AT+CIPSERVER=1,5000");           //Æô¶¯TCP/IP ÊµÏÖ»ùÓÚÍøÂç//¿ØÖÆ   ESP8266_Set("AT+CIPSERVER=1
+             -,5000");
+                  Esp8266_Delay_Ms(500);
+                  ESP8266_Set("AT+CIPSTO=0"); 
+                  Esp8266_Delay_Ms(500);  
+              }
+              /**demo
+              
+              unsigned char buff[30];
+              void EPS8266_Send(void)
+              {
+                static unsigned char Cnt1 = 1;
+                if(++Cnt1 == 20)
+                {
+                  ESP8266_Set("AT+CIPSEND=0,34\r\n");    ////·¢ËÍ×Ö·û³¤¶È  
+                }else if(Cnt1 >= 40)
+                {
+                  Cnt1 = 0;
+                  buff[0]= 'h';
+                  buff[1]= 'e';
+                  buff[2]= 'a';
+                  buff[3]= 'd';
+                  buff[4]= ':';
+                  buff[5]= Ad_dat/100%10+0x30;
+                  buff[6]= Ad_dat/10%10+0x30;
+                  buff[7]= Ad_dat%10+0x30;
+                  buff[8]= ',';
+                  buff[9]= Ad_dat2/100%10+0x30;
+                  buff[10]= Ad_dat2/10%10+0x30;
+                  buff[11]= Ad_dat2%10+0x30;
+                  buff[12]= ',';
+                  buff[13]= MaFlag+0x30;
+                  buff[14]= '5';
+                  buff[15]= ',';  
+                  buff[16]= 'e';  
+                  buff[17]= 'n';  
+                  buff[18]= 'd';
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 34  
+
+                  UartSendString(buff);   
+                } 
+              }
+              
+                Esp8266_init();
+                while(1)
+                {
+                  EPS8266_Send();
+                }
+              
+              **/
+              #endif
+2047          
+2048          /********************ISD4004*********************/
+2049          #if CONFIG_ISD4004 == ENABLED
+              
+              void delayms(unsigned char ms)// ÑÓÊ±×Ó³ÌÐò 
+              {      
+                unsigned char j;
+                while(ms--)
+                {
+                  for(j = 0; j < 120; j++);
+                }
+              }
+              bit flag_xh = 0;
+              ////////////////·ÅÒô²¿·Ö×Ó³ÌÐò£¬·ÅÒôµØÖ·ÓÉADDR¾ö¶¨////
+              void play(unsigned int addr)
+              {
+                unsigned char y;
+                flag_xh = 0;
+                SS=0;
+                MOSI=0;//·¢ËÍ¿ªÊ¼
+                SCLK=0;
+                for(y=0;y<8;y++)
+                {
+                  SCLK=0;
+                  if((0x20>>y)&0x01)MOSI=1;
+                  else MOSI=0;
+                  _nop_();
+                  _nop_();
+                  _nop_();
+                  SCLK=1;
+                  _nop_();
+                  _nop_();
+                  _nop_();
+                }//·¢ËÍ½áÊø
+                SS=1;//ÉÏµç½áÊø
+                delayms(50);
+                SS=0;
+                MOSI=0;//·¢ËÍµØÖ·
+                SCLK=0;
+                for(y=0;y<16;y++)
+                {
+                SCLK=0;
+                if((addr>>y)&0x01)MOSI=1;
+                else MOSI=0;
+                _nop_();
+                _nop_();
+                _nop_();
+                SCLK=1;
+                _nop_();
+                _nop_();
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 35  
+
+                _nop_();
+                }//·¢ËÍµØÖ·½áÊø
+                MOSI=0;//·ÅÒô
+                SCLK=0;
+                for(y=0;y<8;y++)
+                {
+                  SCLK=0;
+                  if((0xe0>>y)&0x01)MOSI=1;
+                  else MOSI=0;
+                  _nop_();
+                  _nop_();
+                  _nop_();
+                  SCLK=1;
+                  _nop_();
+                  _nop_();
+                  _nop_();
+                }
+                SS=1;
+                SS=0;
+                MOSI=0;//·ÅÒô
+                SCLK=0;
+                for(y=0;y<8;y++)
+                {
+                  SCLK=0;
+                  if((0xf0>>y)&0x01)MOSI=1;
+                  else MOSI=0;
+                  _nop_();
+                  _nop_();
+                  _nop_();
+                  SCLK=1;
+                  _nop_();
+                  _nop_();
+                  _nop_();
+                }
+                SS=1;
+                //  flag_xh = 1;   
+              } 
+              //////////////////////////luÒô²¿·Ö×Ó³ÌÐò£¬µØÖ·ÓÉADDR¾ö¶¨/////////////////////////
+              void rec(unsigned int addr)                
+              {
+                unsigned int y; 
+                SS=0;
+                MOSI=0;//·¢ËÍ¿ªÊ¼
+                SCLK=0;
+                for(y=0;y<8;y++)
+                {
+                  SCLK=0;
+                  if((0x20>>y)&0x01)MOSI=1;
+                  else MOSI=0;
+                  _nop_();
+                  _nop_();
+                  _nop_();
+                  SCLK=1;
+                  _nop_();
+                  _nop_();
+                  _nop_();
+                }//·¢ËÍ½áÊø
+                SS=1;//ÉÏµç½áÊø
+                delayms(50);
+                SS=0;
+                MOSI=0;//·¢ËÍ¿ªÊ¼
+                SCLK=0;
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 36  
+
+                for(y=0;y<8;y++)
+                {
+                  SCLK=0;
+                  if((0x20>>y)&0x01)MOSI=1;
+                  else MOSI=0;
+                  _nop_();
+                  _nop_();
+                  _nop_();
+                  SCLK=1;
+                  _nop_();
+                  _nop_();
+                  _nop_();
+                }//·¢ËÍ½áÊø
+                SS=1;//ÉÏµç½áÊø
+                delayms(50);
+                delayms(50);
+                SS=0;
+                MOSI=0;//·¢ËÍµØÖ·
+                SCLK=0;
+                for(y=0;y<16;y++)
+                {
+                  SCLK=0;
+                  if((addr>>y)&0x01)MOSI=1;
+                  else MOSI=0;
+                  _nop_();
+                  _nop_();
+                  _nop_();
+                  SCLK=1;
+                  _nop_();
+                  _nop_();
+                  _nop_();
+                }//·¢ËÍµØÖ·½áÊø
+                MOSI=0;
+                SCLK=0;
+                for(y=0;y<8;y++)
+                {
+                  SCLK=0;
+                  if((0xa0>>y)&0x01)MOSI=1;
+                  else MOSI=0;
+                  _nop_();
+                  _nop_();
+                  _nop_();
+                  SCLK=1;
+                  _nop_();
+                  _nop_();
+                  _nop_();
+                }
+                SS=1;
+                SS=0;
+                MOSI=0;
+                SCLK=0;
+                for(y=0;y<8;y++)
+                {
+                  SCLK=0;
+                  if((0xb0>>y)&0x01)MOSI=1;
+                  else MOSI=0;
+                  _nop_();
+                  _nop_();
+                  _nop_();
+                  SCLK=1;
+                  _nop_();
+                  _nop_();
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 37  
+
+                  _nop_();
+                }
+                SS=1;   }
+              
+              ////////////////////////////////////
+              ////////////////////////////////
+              void stop()
+              { 
+                unsigned char y;
+                SS=1;
+                SS=0;
+                MOSI=0;//·ÅÒô
+                SCLK=0;
+                for(y=0;y<8;y++)
+                {
+                  SCLK=0;
+                  if((0x30>>y)&0x01)MOSI=1;
+                  else MOSI=0;
+                  _nop_();
+                  _nop_();
+                  _nop_();
+                  SCLK=1;
+                  _nop_();
+                  _nop_();
+                  _nop_();
+                }
+                SS=1;
+              }
+              
+              /*demo
+              play(ADDR4STR);
+              
+              */
+              #endif
+2255          
+2256          /********************fuzzify*********************/
+2257          #if CONFIG_FUZZIFY == ENABLED
+              //-----------¶¨ÒåÄ£ºýÏµÍ³²ÎÊý-----------------------------------------------------------
+              //------------------------------------------------------------------------------------
+              // ¶¨Òå²î¾àÊäÈë³£Á¿
+              #define GAP_ZERO     0x00
+              #define GAP_VSMALL   0x01
+              #define GAP_SMALL    0x02
+              #define GAP_MEDIUM   0x03
+              #define GAP_BIG      0x04
+              // ¶¨Òå¿ØÖÆÊä³ö³£Á¿
+              #define TURN_ZERO    0x80
+              #define TURN_VSMALL  0x81
+              #define TURN_SMALL   0x82
+              #define TURN_MEDIUM  0x83
+              #define TURN_BIG     0x84
+              
+              
+              
+              //-----------¶¨ÒåÄ£ºýÏµÍ³²ÎÊý-----------------------------------------------------------
+              //------------------------------------------------------------------------------------
+              //unsigned char Temp_H,Temp_L;
+              
+              //unsigned int sum;       //10´ÎADÖµµÄ×ÛºÏ±äÁ¿
+              //unsigned char RH,RH_H=12,RH_L=8,state,ms,cs;  //µ±Ç°Ë®Î»£¬  Ë®Î»ÉÏÏÞ£¬ÏÂÏÞ£¬  ÉèÖÃÏî±äÁ¿£¬50ms±äÁ¿   £¬c
+             -s Îª¼Æ´ÎÊý±äÁ¿    £¬
+              //bit beep1,zt,s1;    //±¨¾¯±êÖ¾Î»£¬   ¹¤×÷Ä£Ê½±êÖ¾Î»£¬   ÉÁË¸±êÖ¾Î»
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 38  
+
+              
+              //int Temperature;
+               
+              
+              
+              //-----------¶¨ÒåÄ£ºýÏµÍ³²ÎÊý-----------------------------------------------------------
+              //------------------------------------------------------------------------------------
+              //-------------¶¨Òå³£Á¿----------------------------------------------------------------
+              #define MU_MAX 0XFF            //Ä£ºý¶ÈµÄ×î´óÖµÎª0XFF´ú±íÃæ1
+              #define RULE_TOT 10            //¹æÔòÊý¸öÊý
+              #define MF_TOT 5               //³ÉÔ±º¯ÊýµÄ¸öÊý
+              #define IO_NUM 0x07
+              #define LABEL_NUM 0x70
+              #define DEFAULT_VALUE 0x00
+              //----------------¶¨ÒåÊý¾Ý¿â-----------------------------------------------------------
+              unsigned char code output_memf[MF_TOT]={0, 15, 35, 60, 102};// OUTPUT TURNING NUMBER:
+                                                                          // ZERO, VSMALL, SMALL, MEDIUM, BIG
+                                                                          // ÊäÈë¹¦ÄÜº¯ÊýÒÔµãÐ±Ê½·½Ê½´æ´¢. µÚÒ»Î¬³ÉÔ±º¯Ê
+             -ý±êºÅµÚ¶þÎ¬ÊÇµãÐ±Ê½Êý¾Ý
+              unsigned char code input_memf[MF_TOT][4]={                  //¾àÀë¹¦ÄÜº¯Êý
+                                                          { 0x00, 0x00, 0x00, 0x0d }, // VSLOW
+                                                          { 0x00, 0x0d, 0x14, 0x0d }, // SLOW
+                                                          { 0x1e, 0x0d, 0x32, 0x0d }, // MEDIUM
+                                                          { 0x3C, 0x0d, 0x50, 0x0d }, // FAST
+                                                          { 0x50, 0x09, 0x6e, 0x00 }  // VFAST
+                                                        };
+              
+              //-----------¶¨ÒåÄ£ºýÏµÍ³²ÎÊý-----------------------------------------------------------
+              //------------------------------------------------------------------------------------
+              //-----------¶¨ÒåÄ£ºýÏµÍ³¹æÔò-----------------------------------------------------------
+              unsigned char code rules[RULE_TOT]={ 
+                                                      // if...  then...
+                                                      GAP_ZERO,TURN_ZERO,
+                                                      GAP_VSMALL,TURN_VSMALL,
+                                                      GAP_SMALL,TURN_SMALL,
+                                                      GAP_MEDIUM,TURN_MEDIUM,
+                                                      GAP_BIG,TURN_BIG
+                                                 };
+              
+              
+               //-----------¶¨ÒåÄ£ºýÏµÍ³²ÎÊý-----------------------------------------------------------
+              //------------------------------------------------------------------------------------
+               //-----------¶¨Òå¸÷±äÁ¿-----------------------------------------------------------------
+              unsigned char outputs[MF_TOT],fuzzy_out;  //Ä£ºýÊä³ömuÖµ
+              //-----------×Ó³ÌÐòº¯ÊýÍ·ÉêÃ÷-----------------------------------------------------------
+              void fuzzy_engine(unsigned char);
+              unsigned char compute_memval(unsigned char,unsigned char);
+              void defuzzify(void);
+              
+              /*********************************************************************************************************
+             -******/
+              unsigned char compute_memval(unsigned char input,unsigned char label)
+               {
+                  int data temp;
+                  if (input < input_memf[label][0])
+                  {                                 // Èç¹ûÊäÈë²»ÔÚÇúÏßÏÂuÖµÎª0
+                       return 0;
+                  }
+                  else
+                  {
+                      if (input < input_memf[label][2])
+                      {
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 39  
+
+                           temp=input;              // ÓÃµãÐ±Ê½¼ÆËãmu
+                           temp-=input_memf[label][0];
+                           if (!input_memf[label][1])
+                           {
+                              temp=MU_MAX;
+                           }
+                           else
+                           {
+                              temp*=input_memf[label][1];
+                           }
+                           if (temp < 0x100)
+                           {                     // Èç¹û½á¹û²»³¬¹ý1
+                              return temp;       // ·µ»Ø¼ÆËã½á¹û
+                           }
+                           else
+                           {
+                              return MU_MAX;     // È·±£muÖµÔÚ·¶Î§ÄÚ
+                           }
+                      }
+                      else
+                      {                           // ÊäÈëÂäÔÚµÚ¶þÌõÐ±ÏßÉÏ
+                          temp=input;               // ÓÃµãÐ±Ê½·½·¨¼ÆËã mu
+                          temp-=input_memf[label][2];
+                          temp*=input_memf[label][3];
+                          temp=MU_MAX-temp;
+                          if (temp < 0)
+                          {                      // È·±£½á¹û²»Ð¡ÓÚ0
+                                return 0;
+                          }
+                          else
+                          {
+                                return temp;        // muÎªÕý ¨C ·µ»Ø½á¹û
+                          }
+                      }
+                  }
+                  return 0;
+              }
+              /*******************************************************************************
+              Function: defuzzify
+              Description: ¼ÆËãÄ£ºýÊä³öµÄÖØÐÄ²¢µ÷ÓÃº¯Êý°ÑËü
+                           ×ª»»³É¿É±»ÏµÍ³Ê¹ÓÃµÄÊä³öÁ¿
+              Parameters: ÎÞ.
+              Returns: ÎÞ.
+              Side Effects: outputs[][] Êý×é±»ÇåÁã.
+              *******************************************************************************/
+              void defuzzify(void)
+              {
+                  unsigned long numerator, denominator;
+                  unsigned char j;
+                  numerator=0;                         // »Ö¸´×ÜÊýÖµ
+                  denominator=0;
+                  for (j=0; j<MF_TOT; j++)
+                  {                                // ¼ÆËã×ÜºÍÖµ
+                      numerator+=(outputs[j]*output_memf[j]);
+                      denominator+=outputs[j];
+                      outputs[j]=0;                        // ÇåÁãÊä³ö×÷Îª²Î¿¼Ê¹ÓÃ
+                      if (denominator)
+                      {                                     // È·±£·ÖÄ¸ÊÇ0µÄÇé¿ö²»·¢Éú
+                          fuzzy_out=numerator/denominator;  // È·¶¨ COG
+                      }
+                      else
+                      {
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 40  
+
+                          fuzzy_out=DEFAULT_VALUE;         // Ã»ÓÐ¹æÔò±»´¥·¢
+                      }
+                  }
+              }
+              /*******************************************************************************
+              Function: fuzzy_engine
+              Description: ÊµÊ©¹æÔò»ùÖÐµÄ¹æÔò
+              Parameters: ÎÞ
+              Returns: ÎÞ.
+              Side Effects: ÎÞ
+              ********************************************************************************/
+              unsigned char bdata clause_val;                        // ±£´æµ±Ç°µÄ·ÖÖ§½øÐÐ¿ìËÙ·ÃÎÊ
+              sbit clause_type = clause_val^7;                       // ±íÊ¾·ÖÖ§ÊÇ·ñÊÇÌõ¼þ·ÖÖ§»òÕßÊÇ½á¹û·ÖÖ§
+              void fuzzy_engine(unsigned char input)
+              {
+                  bit then;                                       // µ±ÕýÔÚ·ÖÎö½á¹ûÊ±ÖÃÎ»
+                  unsigned char if_val,                           // ±£´æµ±Ç°¹æÔòÖÐÌõ¼þ·ÖÖ§ÖÐµÄÖµ
+                                clause,                           // ¹æÔò»ùÖÐµ±Ç°µÄ·ÖÖ§
+                                    mu,                           // ±£´æµ±Ç°·ÖÖ§ÖÐµÄÖµ
+                               label=0;                           // ±»Ìõ¼þÊ¹ÓÃµÄ³ÉÔ±º¯Êý
+                                then=0;                           // ÉèµÚÒ»¸ö·ÖÖ§ÊÇÌõ¼þ·ÖÖ§
+                         if_val=MU_MAX;                           // max out mu for the first rule
+                  for (clause=0; clause<RULE_TOT; clause++)
+                  {                                               // ±éÀúÃ¿Ìõ¹æÔò
+                      clause_val=rules[clause];                   // ¶ÁÈëµ±Ç°µÄ·ÖÖ§
+                      if (!clause_type)
+                      {                                           // µ±Ç°µÄ·ÖÖ§ÊÇ²»ÊÇÌõ¼þ·ÖÖ§
+                          if (then)
+                          {                                       // ÊÇ·ñÕýÔÚ·ÖÎö½á¹û...
+                              then=0;
+                              if_val=MU_MAX;                      // ¸´Î»mu
+                          }
+                          mu=compute_memval(input, label);        // µÃµ½Ìõ¼þ·ÖÖ§µÄÖµ
+                          if_val=mu;
+                          label++;
+                      }
+                      else
+                      {                                       // µ±Ç°·ÖÖ§ÊÇ½á¹û
+                          then=1;            // ÖÃÎ»±êÖ¾Î»,Èç¹ûµ±Ç°¹æÔòµÄmu±È²Î¿¼µÄÖµÒª´ó,±£´æÕâ¸öÖµ×÷ÎªÐÂµÄÄ£ºýÊä³ö
+                          if (outputs[clause_val&0x07] < if_val)
+                          {
+                              outputs[clause_val&0x07]=if_val;
+                          }
+                      }
+                  }
+                  defuzzify(); // ÓÃCOG·½·¨¼ÆËãÄ£ºýÊä³öºÍ·´Ä£ºýÊä³ö
+               }
+              
+              /*demo
+                  if(Temperature <= Temp_L)//Ð¡ÓÚÉè¶¨ÖµÊ±£¬²ÉÓÃÄ£ºý¼ÆËã
+                  {
+                          
+                   //Ä£ºý¼ÆËã
+                    fuzzy_engine((Temp_L - Temperature)*10);
+                   
+                   if(fuzzy_out)  //¸ù¾ÝÄ£ºý¼ÆËã½á¹û£¬´¦ÀíÊä³ö×´Ì¬
+                   {
+                      LED_3_BUF = led_3=0;    //ÏÔÊ¾¶ÔÓ¦µÄÖ¸Ê¾µÆ
+                   }
+                   else
+                   {
+                     LED_3_BUF = led_3=0;   //ÏÔÊ¾¶ÔÓ¦µÄÖ¸Ê¾µÆ 
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 41  
+
+                   }    
+                    
+                  } 
+               
+               */
+              #endif
+2472          
+2473          /********************EX0_EX1*********************/
+2474          #if CONFIG_EX0_EX1 == ENABLED
+              
+              static EX0_1_Process EX0_Process;
+              static EX0_1_Process EX1_Process;
+              void EX0_INIT(EX0_1_Process T_Process)
+              {
+                EX0=1;     //¿ªÖÐ¶Ï0
+                IT0=1;     //ÖÐ¶Ï0Îª±ßÑØ´¥·¢
+                EA=1;     //¿ª×ÜÖÐ¶Ï
+                EX0_Process = T_Process;
+              }
+              
+              void EX1_INIT(EX0_1_Process T_Process)
+              {
+                EX1=1;     //¿ªÖÐ¶Ï0
+                IT1=1;     //ÖÐ¶Ï0Îª±ßÑØ´¥·¢
+                EA=1;     //¿ª×ÜÖÐ¶Ï
+                EX1_Process = T_Process;
+              }
+              
+              
+              //Íâ²¿0ÖÐ¶Ï×Óº¯Êý
+              void wb0() interrupt 0  //±ÈÈüÊ±¼ä¿ªÊ¼/ÔÝÍ£
+              {
+                EX0_Process();
+              }
+              //Íâ²¿1ÖÐ¶Ï×Óº¯Êý
+              void wb1() interrupt 2   //24sµ¹¼ÆÊ±ÖØÐÂ¿ªÊ¼
+              {
+                EX1_Process();
+              }
+              /*DEMO
+              
+              sbit LED0 = P1^1;
+              sbit LED1 = P1^2;
+              void Ex0_Process()
+              {
+                LED0 = ~LED0;
+              }
+              void Ex1_Process()
+              {
+                LED1 = ~LED1;
+              }
+              void main()
+              {
+                EX0_INIT(Ex0_Process);
+                EX1_INIT(Ex1_Process);
+                while(1)
+                {
+              
+                }
+              }
+              
+              */
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 42  
+
+              #endif
+2529          
+2530          /********************LCD12864*********************/
+2531          #if CONFIG_LCD12864 == ENABLED
+              
+              
+              
+              //ÑÓÊ±º¯Êý
+              void delay(unsigned char t)
+              {
+                unsigned char i,j;
+                for(i=0;i<t;i++)
+                  for(j=0;j<10;j++);
+              }
+              
+              //Ð´ÃüÁîº¯Êý
+              void write_com(unsigned char cmdcode)
+              {
+                Di=0;
+                RW=0;
+                P0=cmdcode;   
+                delay(2);
+                Enable=1;
+                delay(2);
+                Enable=0;
+              }
+              //Ð´Êý¾Ýº¯Êý
+              void write_data(unsigned char Dispdata)
+              {
+                Di=1;
+                RW=0;
+                P0=Dispdata;
+                delay(2);
+                Enable=1;
+                delay(2);
+                Enable=0;
+              }
+              
+              //ÇåÆÁº¯Êý
+              void Lcd_Clr()
+              {
+                unsigned char j,k;
+                cs1=1;cs2=1;
+                write_com(Page_Add+0);
+                write_com(Col_Add+0);
+                for(k=0;k<8;k++)
+                {
+                  write_com(Page_Add+k);
+                    for(j=0;j<64;j++)write_data(0x00);
+                }
+                cs1=0;cs2=0;
+              }
+              
+              /****************************************
+              ¶¨Î»º¯Êý£¬¶¨Î»Ò»¸ö×Ö£¬
+              ÆäÖÐpagÎªÐÐÊý0~3£¬
+              colÎªÁÐÊý£¬col=16i£¬i=0~8
+              *hzkÎªÒªÏÔÊ¾µÄÄÚÈÝ£»
+              ****************************************/
+              void hz_disp16(unsigned char pag,unsigned char col, unsigned char code *hzk)
+              {
+                unsigned char j=0,i=0;
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 43  
+
+                for(j=0;j<2;j++)
+                {
+                  write_com(Page_Add+pag+j);
+                  write_com(Col_Add+col);
+                  for(i=0;i<16;i++) 
+                  write_data(hzk[16*j+i]);
+                }
+              }
+              
+              /****************************************
+              ¶¨Î»º¯Êý£¬¶¨Î»Ò»¸ö×Ö½Ú£¬
+              ÆäÖÐpagÎªÐÐÊý0~3£¬
+              colÎªÁÐÊý£¬col=8i£¬i=0~16
+              *hzkÎªÒªÏÔÊ¾µÄÄÚÈÝ£»
+              ****************************************/
+              void hz_disp8(unsigned char pag,unsigned char col, unsigned char code *hzk)
+              {
+                unsigned char j=0,i=0;
+                for(j=0;j<2;j++)
+                {
+                  write_com(Page_Add+pag+j);
+                  write_com(Col_Add+col);
+                  for(i=0;i<8;i++) 
+                  write_data(hzk[8*j+i]);
+                }
+                    
+              }
+              
+              //lcd³õÊ¼»¯º¯Êý
+              void Lcd_Init()
+              {
+                delay(100);
+                cs1=1;
+                cs2=1;
+                delay(100);
+                write_com(0x83);
+                write_com(Disp_Off);
+                write_com(Page_Add+0);
+                write_com(Start_Line+0);
+                write_com(Col_Add+0);
+                write_com(Disp_On);
+              
+              }
+              
+              /*demo
+              
+              //Åè»¨×Ô¶¯½½Ë®ÏµÍ³
+              char code pen[]={
+              0x20,0x20,0x10,0x08,0x94,0x72,0x10,0x90,0x13,0xF4,0x08,0x10,0x20,0x60,0x20,0x00,
+              0x40,0x40,0x7D,0x45,0x44,0x7C,0x44,0x44,0x45,0x7C,0x44,0x44,0x7E,0x44,0x40,0x00
+              };
+              
+              char code jiao[]={
+              0x10,0x21,0x62,0x06,0x80,0x08,0x88,0x8B,0x5C,0x24,0x54,0x84,0x86,0xE4,0x00,0x00,
+              0x04,0x04,0xFE,0x01,0x80,0x82,0x42,0x3E,0x02,0x02,0x7E,0x82,0x82,0x82,0xE0,0x00
+              };
+              
+              
+              //ÏÔÊ¾¡®0¡¯£¬¡®1¡¯£¬¡®2¡¯£¬¡®3¡¯£¬¡®4¡¯£¬¡®5¡¯£¬¡®6¡¯£¬¡®7¡¯£¬¡®8¡¯£¬¡®9¡¯
+              char code base_num[][16]={
+              //'0'
+              {0x00,0xE0,0x10,0x08,0x08,0x10,0xE0,0x00,0x00,0x0F,0x10,0x20,0x20,0x10,0x0F,0x00},
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 44  
+
+              //'1'
+              {0x00,0x10,0x10,0xF8,0x00,0x00,0x00,0x00,0x00,0x20,0x20,0x3F,0x20,0x20,0x00,0x00},
+              //'2'
+              {0x00,0x70,0x08,0x08,0x08,0x88,0x70,0x00,0x00,0x30,0x28,0x24,0x22,0x21,0x30,0x00},
+              //'3'
+              {0x00,0x30,0x08,0x88,0x88,0x48,0x30,0x00,0x00,0x18,0x20,0x20,0x20,0x11,0x0E,0x00},
+              //'4'
+              {0x00,0x00,0xC0,0x20,0x10,0xF8,0x00,0x00,0x00,0x07,0x04,0x24,0x24,0x3F,0x24,0x00},
+              //'5'
+              {0x00,0xF8,0x08,0x88,0x88,0x08,0x08,0x00,0x00,0x19,0x21,0x20,0x20,0x11,0x0E,0x00},
+              //'6'
+              {0x00,0xE0,0x10,0x88,0x88,0x18,0x00,0x00,0x00,0x0F,0x11,0x20,0x20,0x11,0x0E,0x00},
+              //'7'
+              {0x00,0x38,0x08,0x08,0xC8,0x38,0x08,0x00,0x00,0x00,0x00,0x3F,0x00,0x00,0x00,0x00},
+              //'8'
+              {0x00,0x70,0x88,0x08,0x08,0x88,0x70,0x00,0x00,0x1C,0x22,0x21,0x21,0x22,0x1C,0x00},
+              //'9'
+              {0x00,0xE0,0x10,0x08,0x08,0x10,0xE0,0x00,0x00,0x00,0x31,0x22,0x22,0x11,0x0F,0x00},
+              
+              {0xE0,0x10,0x08,0x08,0x08,0x10,0xE0,0x00,0x0F,0x18,0x24,0x24,0x38,0x50,0x4F,0x00},
+              
+              {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x37,0x00,0x00,0x00,0x00,0x00,0x00},
+              
+              {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
+              
+              {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x01,0x01,0x01,0x01,0x01,0x01},
+              
+              {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x0C,0x0C,0x00,0x00,0x00,0x00},
+              
+              };
+                unsigned int temp,humi;   //¶¨ÒåÎÂ¶ÈºÍÊª¶È±äÁ¿
+                value humi_val,temp_val;    //¶¨ÒåÁ½¸ö¹²Í¬Ìå£¬Ò»¸öÓÃÓÚÊª¶È£¬Ò»¸öÓÃÓÚÎÂ¶È
+                unsigned char error;        //ÓÃÓÚ¼ìÑéÊÇ·ñ³öÏÖ´íÎó
+                unsigned char checksum;     //CRC      
+                unsigned char  wendu[6];          //ÓÃÓÚ¼ÇÂ¼ÎÂ¶È
+                unsigned char  shidu[6];          //ÓÃÓÚ¼ÇÂ¼Êª¶È    
+              void System_Show()    //ÐÅÏ¢ÏÔÊ¾
+              {
+                cs1=1;cs2=0;
+                hz_disp16(0,0,pen);   //Åè»¨×Ô¶¯
+              
+                     
+                cs1=0;cs2=1;
+                hz_disp16(0,0,jiao);  //½½Ë®ÏµÍ³
+              
+              
+              }
+              void main()
+              {
+                Lcd_Init();
+                
+                while(1)
+                {
+                  error=0;             //³õÊ¼»¯error=0£¬¼´Ã»ÓÐ´íÎó
+                  error+=s_measure((unsigned char*)&temp_val.i,&checksum,TEMP); //ÎÂ¶È²âÁ¿
+                  error+=s_measure((unsigned char*)&humi_val.i,&checksum,HUMI); //Êª¶È²âÁ¿
+                  if(error!=0)
+                    s_connectionreset();                 ////Èç¹û·¢Éú´íÎó£¬ÏµÍ³¸´Î»
+                  else
+                  {     
+                  humi_val.f=(float)humi_val.i;                   //×ª»»Îª¸¡µãÊý
+                  temp_val.f=(float)temp_val.i;                   //×ª»»Îª¸¡µãÊý
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 45  
+
+                  calc_sth10(&humi_val.f,&temp_val.f);            //ÐÞÕýÏà¶ÔÊª¶È¼°ÎÂ¶È
+                  //      dew_point=calc_dewpoint(humi_val.f,temp_val.f); //¼ÆËãe dew_point
+                  temp=temp_val.f*10;
+                  humi=humi_val.f*10; 
+              
+                        wendu[0]=(temp/1000)/1000;        //ÎÂ¶È°ÙÎ» 
+                        wendu[1]=(temp%1000)/100;       //ÎÂ¶ÈÊ®Î»  
+                        wendu[2]=(temp%100)/10;     //ÎÂ¶È¸öÎ»
+                        wendu[3]=0x2E;            //Ð¡Êýµã
+                        wendu[4]=temp%10;       //ÎÂ¶ÈÐ¡ÊýµãºóµÚÒ»Î»    
+                     
+                        shidu[0]=(humi/1000)/1000;        //Êª¶È°ÙÎ»
+                        shidu[1]=(humi%1000)/100;       //Êª¶ÈÊ®Î»  
+                        shidu[2]=(humi%100)/10;     //Êª¶È¸öÎ»
+                        shidu[3]=0x2E;            //Ð¡Êýµã
+                        shidu[4]=humi%10;       //Êª¶ÈÐ¡ÊýµãºóµÚÒ»Î»   
+              
+                        cs1=0;cs2=1;
+                        hz_disp8(2,0,base_num[wendu[0]]); //ÏÔÊ¾ÎÂ¶È
+                        hz_disp8(2,8,base_num[wendu[1]]);
+                        hz_disp8(2,16,base_num[wendu[2]]);
+                        hz_disp8(2,24,base_num[14]);
+                        hz_disp8(2,32,base_num[wendu[4]]);
+                        hz_disp8(2,40,base_num[12]);
+              
+                        hz_disp8(4,0,base_num[shidu[0]]); //ÏÔÊ¾Êª¶È
+                        hz_disp8(4,8,base_num[shidu[1]]);
+                        hz_disp8(4,16,base_num[shidu[2]]);
+                        hz_disp8(4,24,base_num[14]);
+                        hz_disp8(4,32,base_num[shidu[4]]);
+                        hz_disp8(4 ,40,base_num[12]);
+              
+                    
+                  System_Show();
+                  }
+                }
+              }
+              
+              */
+              #endif
+2754          
+2755          /********************IR_SEND*********************/
+2756          #if CONFIG_IRSEND == ENABLED
+              
+              
+              //ºìÍâ·¢Éä¹ÜµÄÁÁÃð¿ØÖÆ
+              static bit OP;
+              //ÑÓÊ±¼ÆÊýÆ÷
+              static unsigned int count;
+              //ÖÕÖ¹ÑÓÊ±¼ÆÊýÆ÷
+              static unsigned int endcount;
+              //ºìÍâ·¢ËÍ±êÖ¾
+              static unsigned char flag;
+              //16Î»µØÖ· µÚÒ»×Ö½Ú
+              char iraddr1;
+              //16Î»µØÖ· µÚ¶þ×Ö½Ú
+              char iraddr2;
+              
+              void time0_init()
+              {
+                //×ÜÖÐ¶Ï¿ª
+                EA=1;
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 46  
+
+                //ÉèÖÃ¶¨Ê±Æ÷0ºÍ1Îª16Î»Ä£Ê½
+                TMOD=0x11;
+                //¶¨Ê±Æ÷0ÖÐ¶ÏÔÊÐí
+                ET0=1;
+                //Éè¶¨¶¨Ê±´óÐ¡ 38K µÈ¼ÓÓÚ 26usÖÐ¶ÏÒ»´Î             
+                TH0=0xff;
+                TL0=0xe6;
+                //¿ªÊ¼¼ÆÊý
+                TR0=1;  
+              }
+              
+              
+              //¶¨Ê±Æ÷0ÖÐ¶Ï´¦Àíº¯Êý
+              void timeint(void) interrupt 1
+              {
+                //Éè¶¨¶¨Ê±Æ÷³õÖµ
+                TH0=0xff;
+                TL0=0xe6;
+                
+                //ÖÐ¶Ï¼ÆÊýÀÛ¼Ó
+                count++;
+                if(flag==1)
+                {
+                  OP=1;
+                }
+                else
+                {
+                  OP=0;
+                }
+                HL=OP;
+              }
+              
+              
+              //·¢ËÍÊý¾Ýº¯Êý
+              //·¢ËÍµÄÑÓÊ±Ê±¼ä²ÎÊý¼´(endcount)¶¼ÊÇÔÚ12MHZµÄÖµ
+              void SendIRdata(char p_irdata)
+              {
+                int i;
+                char irdata=p_irdata;
+                
+                //·¢ËÍ9msµÄÆðÊ¼Âë
+                endcount=223;
+                flag=1;
+                count=0;
+                while(count<endcount);
+              
+                //·¢ËÍ4.5msµÄ½á¹ûÂë
+                endcount=117;
+                flag=0;
+                count=0;
+                do{}while(count<endcount);
+              
+                //·¢ËÍ16Î»µØÖ·µÄÇ°°ËÎ»
+                irdata=iraddr1;
+                for(i=0;i<8;i++)
+                {
+                  //ÏÈ·¢ËÍ0.56msµÄ38KºìÍâ²¨(¼´±àÂëÖÐµÄ0.56msµÄµÍµçÆ½£©
+                  endcount=13;
+                  flag=1;
+                  count=0;
+                  do{}while(count<endcount);
+              
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 47  
+
+                  //Í£Ö¹·¢ËÍºìÍâÐÅºÅ(¼´±àÂëÖÐµÄ¸ßµçÆ½)
+                  if(irdata-(irdata/2)*2)//ÅÐ¶Ï¶þ½øÖÆµÄ¸öÎ»ÊÇ1»¹ÊÇ0
+                  {
+                    endcount=41;//1
+                  }
+                  else
+                  {
+                    endcount=13;//0
+                  }
+                  flag=0;
+                  count=0;
+                  do{}while(count<endcount);
+                  irdata=irdata>>1;
+                }
+              
+                //·¢ËÍ16Î»µØÖ·µÄºó°ËÎ»
+                irdata=iraddr2;
+                for(i=0;i<8;i++)
+                {
+                  //ÏÈ·¢ËÍ0.56msµÄ38KºìÍâ²¨(¼´±àÂëÖÐµÄ0.56msµÄµÍµçÆ½£©
+                  endcount=13;
+                  flag=1;
+                  count=0;
+                  do{}while(count<endcount);
+              
+                  //Í£Ö¹·¢ËÍºìÍâÐÅºÅ(¼´±àÂëÖÐµÄ¸ßµçÆ½)
+                  if(irdata-(irdata/2)*2)//ÅÐ¶Ï¶þ½øÖÆµÄ¸öÎ»ÊÇ1»¹ÊÇ0
+                  {
+                    endcount=41;//1
+                  }
+                  else
+                  {
+                    endcount=13;//0
+                  }
+                  flag=0;
+                  count=0;
+                  do{}while(count<endcount);
+                  irdata=irdata>>1;
+                }
+              
+              
+                //·¢ËÍ8Î»Êý¾Ý
+                irdata=p_irdata;
+                for(i=0;i<8;i++)
+                {
+                  //ÏÈ·¢ËÍ0.56msµÄ38KºìÍâ²¨(¼´±àÂëÖÐµÄ0.56msµÄµÍµçÆ½£©
+                  endcount=13;
+                  flag=1;
+                  count=0;
+                  do{}while(count<endcount);
+              
+                  //Í£Ö¹·¢ËÍºìÍâÐÅºÅ(¼´±àÂëÖÐµÄ¸ßµçÆ½)
+                  if(irdata-(irdata/2)*2)//ÅÐ¶Ï¶þ½øÖÆµÄ¸öÎ»ÊÇ1»¹ÊÇ0
+                  {
+                    endcount=41;//1
+                  }
+                  else
+                  {
+                    endcount=13;//0
+                  }
+                  flag=0;
+                  count=0;
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 48  
+
+                  do{}while(count<endcount);
+                  irdata=irdata>>1;
+                }
+              
+              
+                //·¢ËÍ8Î»Êý¾Ý·´Âë
+                irdata=~p_irdata;
+                for(i=0;i<8;i++)
+                {
+                  //ÏÈ·¢ËÍ0.56msµÄ38KºìÍâ²¨(¼´±àÂëÖÐµÄ0.56msµÄµÍµçÆ½£©
+                  endcount=13;
+                  flag=1;
+                  count=0;
+                  do{}while(count<endcount);
+              
+                  //Í£Ö¹·¢ËÍºìÍâÐÅºÅ(¼´±àÂëÖÐµÄ¸ßµçÆ½)
+                  if(irdata-(irdata/2)*2)//ÅÐ¶Ï¶þ½øÖÆµÄ¸öÎ»ÊÇ1»¹ÊÇ0
+                  {
+                    endcount=41;//1
+                  }
+                  else
+                  {
+                    endcount=13;//0
+                  }
+                  flag=0;
+                  count=0;
+                  do{}while(count<endcount);
+                  irdata=irdata>>1;
+                }
+                //½áÊøÐÅÏ¢
+                endcount=13;
+                flag=1;
+                count=0;
+                do{}while(count<endcount);
+                flag=0;
+              }
+              
+              void IR_init()
+              {
+                //³õÊ¼»¯
+                count=0;
+                flag=0;
+                OP=0;
+                HL=0;
+                time0_init(); 
+                //Ð´16Î»µØÖ·
+                iraddr1=0;
+                iraddr2=255;
+              }
+              
+              
+              #endif
+2952          
+2953          #if CONFIG_DS18B20_MULT== ENABLED
+              
+              bit first =1;
+              idata unsigned char ID[MAXNUM][8];
+              unsigned char num=0;
+              unsigned char temp_l,temp_h,temp_over,t; 
+              bit negetiveflag=0;
+              signed char tempalarm=0;
+              void delay_nus(unsigned int n)//?? ?? ??8+6(??)=14us
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 49  
+
+              {
+                while(n--);
+              }
+              
+              void reset(void)  //ds18b20???????
+              {
+                 unsigned char x=0;
+                 DQ = 1;            //DQ??
+                 delay_nus(8);    //????
+                 DQ = 0;            //????DQ??
+                 delay_nus(80);   //???? ?? 480us
+                 DQ = 1;            //????
+                 delay_nus(10);
+                 x=DQ;              //????? ??x=0?????? x=1??????
+                 delay_nus(5);
+              }
+              
+              void write_bit(unsigned char dat) //DS18B20 ??? ??
+              {
+                  DQ = 0;
+                _nop_();
+                  _nop_();
+                DQ = dat&0x01;
+                  delay_nus(5);
+                DQ = 1;
+              }
+              
+              void write_byte(unsigned char dat)//?????
+              {
+                unsigned char i,j;
+                for (i=8; i>0; i--)
+                {
+                  j=dat&0x01;
+                    write_bit(j);
+                  dat>>=1;
+                  }
+              }
+              
+              unsigned char read_2bit(void)//??? ???
+              {
+                unsigned char i;
+                unsigned char dat = 0;
+                for (i=2;i>0;i--)
+                {
+                  DQ = 0; // ?????
+                  dat<<=1;
+                  DQ = 1; // ?????
+                  if(DQ)
+                  dat|=0x01;
+                  delay_nus(4);
+                }
+                return(dat);
+              }
+              
+              unsigned char read_byte(void)//????? ???
+              {
+                unsigned char i=0;
+                unsigned char dat = 0;
+                for (i=8;i>0;i--)
+                {
+                  DQ = 0; // ?????
+                  dat>>=1;
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 50  
+
+                  DQ = 1; // ?????
+                  if(DQ)
+                  dat|=0x80;
+                  delay_nus(4);
+                }
+                return(dat);  
+              }
+              void delay_nms(unsigned int n)
+              {
+                unsigned int j=0;
+                unsigned char i=0;
+                for(j=0;j<n;j++)
+                {
+                  for(i=0;i<120;i++)
+                  {
+                    _nop_();
+                  }
+                }
+              }
+              
+              
+              void read_temp(unsigned char num_data)//???? ??? ???????????
+              {
+                unsigned char f;  
+                reset();
+                write_byte(0xcc);//????ROM???
+                write_byte(0x44);//????????
+                if(first)
+                {
+                  first =0;
+                  delay_nms(2000);
+                }
+                else
+                  delay_nms(100);   
+                reset();
+                write_byte(0x55);//????ROM???
+                for(f=0;f<8;f++) //8??ROM?
+                {
+                  write_byte(ID[num_data][f]);//???ROM
+                }
+                
+                delay_nus(100);
+                write_byte(0xbe);//??????
+                delay_nus(100);
+                temp_l=read_byte();
+                temp_h=read_byte();
+              }
+              
+               
+              void temp_convert(void)//????
+              {
+                negetiveflag=0;
+                negetiveflag=temp_h&0x80;
+                if(negetiveflag)
+                {
+                  negetiveflag=1;
+                  temp_h=~temp_h;
+                    if(temp_l==0)
+                  {
+                    temp_h++;  //??8???0?????,?????????1
+                  }
+                    temp_l=~temp_l+1; 
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 51  
+
+                }
+                temp_h<<=4;
+                temp_l>>=4;
+                temp_over=temp_h|temp_l;
+                tempalarm=temp_over;
+                if(negetiveflag==1)
+                {
+                   tempalarm=tempalarm*(-1);
+                }
+              }
+              void display_total(void)    //??????DS18B20?????
+              {
+                //Lcd1602_Display_String(0,0,"total num :");
+                //Lcd1602_Display_Two_bit(0,10,num);
+              }
+              /***********************????ROM*****************************/
+              void search_rom(void)//??ROM
+              { 
+                unsigned char k=0,l=0,chongtuwei=0,m=0,n=0;
+                unsigned char s=0;
+                unsigned char zhan[MAXNUM];
+                unsigned char ss[64];
+                do
+                {
+                  reset();
+                  write_byte(0xf0);  //??ROM??  
+                  for(m=0;m<8;m++)
+                  {
+                    for(n=0;n<8;n++)
+                    {
+                      k=read_2bit();//?????
+                      k=k&0x03;   
+                      s>>=1;
+                      if(k==0x01)//01??????0 ?0 ???0?????
+                      {       
+                        write_bit (0);
+                          ss[(m*8+n)]=0;
+                      }
+                      else if(k==0x02)//??????1 ?1 ???1?????
+                      {
+                        s=s|0x80;
+                        write_bit (1);
+                        ss[(m*8+n)]=1;
+                      }
+                      else if(k==0x00)//??????0  ???? ????? 
+                      {       //??????????0 ????????? ?????1
+                        chongtuwei=m*8+n+1;         
+                        if(chongtuwei>zhan[l])
+                        {           
+                          write_bit (0);
+                          ss[(m*8+n)]=0;                        
+                          zhan[++l]=chongtuwei;           
+                        }
+                        else if(chongtuwei<zhan[l])
+                        {
+                          s=s|((ss[(m*8+n)]&0x01)<<7);
+                          write_bit (ss[(m*8+n)]);
+                        }
+                        else if(chongtuwei==zhan[l])
+                        {
+                          s=s|0x80;
+                          write_bit (1);
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 52  
+
+                          ss[(m*8+n)]=1;
+                          l=l-1;
+                        }
+                      }
+                      else
+                      {
+                        goto loop;
+                      }
+                    }
+                    ID[num][m]=s;   
+                  }
+                  num++;
+                }
+                while(zhan[l]!=0&&(num<MAXNUM));    
+              loop:
+                //search_cartoon();
+                display_total();
+              
+              }
+              
+              void DS18B20_Processing(unsigned char *Temp_Value)
+              {
+                static unsigned char i=0;
+              
+                ET0 = 0;          
+                read_temp(i);   //??? i ?ds18b20 ???
+                ET0 = 1;
+              
+                temp_convert(); //??????
+              
+                switch(i)
+                {
+                  case 0:
+                    Temp_Value[0] = tempalarm;          
+                  break;
+              
+                  case 1:
+                    Temp_Value[1] = tempalarm;
+              
+                          
+                  break;      
+                  case 2:
+                    Temp_Value[2] = tempalarm;
+              
+                  break;  
+              
+                  case 3:
+                    Temp_Value[3] = tempalarm;
+              
+                  break;  
+                  case 4:
+                    Temp_Value[4] = tempalarm;  
+              
+                  break;              
+                }
+                i++;
+                if(i >= num)
+                i = 0;
+              }
+              #endif
+
+
+C51 COMPILER V9.52.0.0   MYDEMO                                                            07/15/2021 13:56:41 PAGE 53  
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    261    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
